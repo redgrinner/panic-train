@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+    <!--
+	<link rel="stylesheet" type="text/css" href="css/index.css" />
+    -->
+	
+	<title>Explode</title>
+	
+	<style type="text/css"> 
+		
+		/*trying something out for responsive web design, as with the meta tag above*/
+		@-ms-viewport
+		{
+		  width: device-width;
+		}
+		
+		@font-face {
+		font-family: "ineptic";
+		src: url(font/font_ineptic.otf) format("truetype");
+		}
+		
+		body 
+		{
+			color: #E9E9E9;
+			background-color: black;	
+			font-family: "My Custom Font", Robota, Tahoma;
+			font-size: 15px;
+			/*background-image: url("images/black3.png");*/
+		}
+	
+		.button2 
+		{
+			color: black;
+			background-color: white;
+			border: 1px solid white;
+			padding: 2px 4px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 18px;
+			font-family: 'Abel', sans-serif;
+			margin: 4px 2px;
+			-webkit-transition-duration: 0.4s; /* Safari */
+			transition-duration: 0.4s;
+			cursor: pointer;
+			height: 40px;
+			width: 50px; /*50px*/
+			border-radius: 4px;
+		}
+		
+		.button2:hover 
+		{
+			color: black;
+			background-color: orange;			
+			border: 1px solid black;
+		}
+		
+		.primaryCanvas 
+		{
+			/*box-sizing: border-box;*/
+			
+			/*background:#0e8e39;*/ 
+			/*#000;*/
+			position:absolute;
+			top:10px; /*10px*/
+			left: 10px; /*10px*/
+			border: 0px solid rgba(0,255,0,.2);
+			border-radius: 12px;
+			z-index:2;
+			/*background-image: radial-gradient(limegreen, darkgreen);*/ /*weird gradient bg*/
+		}
+				
+		.titleText{
+            color: peru;
+            font-size: 50px;
+			font-family: "ineptic", Verdana, Tahoma;
+        } 
+		
+		.center
+		{
+			text-align:center;
+			-webkit-border-radius: 0.75em;
+			/*-moz-border-radius: 0.75em;*/
+			border-radius:0.75em;			
+			/*background-color:rgba(33, 33, 33, 0.6);*/
+			color:#ffffff;
+			padding:25px;
+			
+			margin: 0;
+			position: absolute;
+			top: 40%;
+			left: 50%;
+			transform: translate(-50%, -30%);
+	
+		}
+		.adjustedCenter
+		{
+			box-sizing: border-box;
+			text-align:center;
+			-webkit-border-radius: 0.75em;
+			/*-moz-border-radius: 0.75em;*/
+			border-radius:0.75em;			
+			/*background-color:rgba(33, 33, 33, 0.6);*/
+			color:#ffffff;
+			padding:10px; /*25px*/
+		}
+		
+		.menuScreen
+		{
+			position: absolute;
+			z-index:9;
+			background:#232323;
+			border: 0px solid orange;
+			display: block;
+			width: 250px; /**/
+			/*height:800px;*/
+			display: none;
+		}
+		
+		@keyframes rainbow-text 
+		{
+		  0% {
+			color: #e87d7d;
+		  }
+		  2% {
+			color: #e88a7d;
+		  }
+		  4% {
+			color: #e8977d;
+		  }
+		  6% {
+			color: #e8a47d;
+		  }
+		  8% {
+			color: #e8b07d;
+		  }
+		  10% {
+			color: #e8bd7d;
+		  }
+		  12% {
+			color: #e8ca7d;
+		  }
+		  14% {
+			color: #e8d77d;
+		  }
+		  16% {
+			color: #e8e47d;
+		  }
+		  18% {
+			color: #dfe87d;
+		  }
+		  20% {
+			color: #d3e87d;
+		  }
+		  22% {
+			color: #c6e87d;
+		  }
+		  24% {
+			color: #b9e87d;
+		  }
+		  26% {
+			color: #ace87d;
+		  }
+		  28% {
+			color: #9fe87d;
+		  }
+		  30% {
+			color: #92e87d;
+		  }
+		  32% {
+			color: #86e87d;
+		  }
+		  34% {
+			color: #7de881;
+		  }
+		  36% {
+			color: #7de88e;
+		  }
+		  38% {
+			color: #7de89b;
+		  }
+		  40% {
+			color: #7de8a8;
+		  }
+		  42% {
+			color: #7de8b5;
+		  }
+		  44% {
+			color: #7de8c1;
+		  }
+		  46% {
+			color: #7de8ce;
+		  }
+		  48% {
+			color: #7de8db;
+		  }
+		  50% {
+			color: #7de8e8;
+		  }
+		  52% {
+			color: #7ddbe8;
+		  }
+		  54% {
+			color: #7dcee8;
+		  }
+		  56% {
+			color: #7dc1e8;
+		  }
+		  58% {
+			color: #7db5e8;
+		  }
+		  60% {
+			color: #7da8e8;
+		  }
+		  62% {
+			color: #7d9be8;
+		  }
+		  64% {
+			color: #7d8ee8;
+		  }
+		  66% {
+			color: #7d81e8;
+		  }
+		  68% {
+			color: #867de8;
+		  }
+		  70% {
+			color: #927de8;
+		  }
+		  72% {
+			color: #9f7de8;
+		  }
+		  74% {
+			color: #ac7de8;
+		  }
+		  76% {
+			color: #b97de8;
+		  }
+		  78% {
+			color: #c67de8;
+		  }
+		  80% {
+			color: #d37de8;
+		  }
+		  82% {
+			color: #df7de8;
+		  }
+		  84% {
+			color: #e87de4;
+		  }
+		  86% {
+			color: #e87dd7;
+		  }
+		  88% {
+			color: #e87dca;
+		  }
+		  90% {
+			color: #e87dbd;
+		  }
+		  92% {
+			color: #e87db0;
+		  }
+		  94% {
+			color: #e87da4;
+		  }
+		  96% {
+			color: #e87d97;
+		  }
+		  98% {
+			color: #e87d8a;
+		  }
+		  100% {
+			color: #e87d7d;
+		  }
+		}
+		.rainbow-text 
+		{
+		  animation: rainbow-text 1s infinite;
+		}
+		
+	</style>
+	
+</head>
+
+<body onload="startingSetup();">
+   
+   <!--
+   <div class="app">
+        
+		<h1>Hello Shotgun Triangle</h1>
+        <div id="deviceready" class="blink">
+            <p class="event listening">Connecting to Device</p>
+            <p class="event received">Device is Ready</p>
+        </div>
+			
+    </div>
+	-->
+	
+	<canvas id="primaryCanvas" class="primaryCanvas" onclick="canvasClick(event)"></canvas>
+	
+	<div id="menuScreen" class="menuScreen center">
+		<span id="menuTitle" class="titleText" style="color:orange">E X P L O D E</span>
+		<br />
+		<br />
+		<span id="output">Prevent the enemy from breaching our defenses.</span> <br />
+		<br />
+		<input type ="button" value ="START" style="width:245px;" onclick="continueGame();" class="button2"><br />
+	</div>
+	
+	<div id="loseScreen" class="menuScreen center">
+		<span class="titleText" style="color:red">GAME OVER</span>
+		<br />
+		<br />
+		<span id="output_fail">You failed to stop the enemy.</span> <br />
+		<br />
+		<span id="score_fail">SCORE: 0</span> <br />
+		<span id="level_fail">LEVEL: 0</span> <br />
+		<br />
+		<input type ="button" value ="RESTART" style="width:245px;" onclick="continueGame();" class="button2"><br />
+	</div>
+	
+	<div id="winScreen" class="menuScreen center">
+		<span class="titleText" id="titleText" style="color:orange">V I C T O R Y</span>
+		<br />
+		<br />
+		<span id="output_win">You successfully survived the wave.</span> <br />
+		<br />
+		<span id="score_win">SCORE: 0</span> <br />
+		<span id="level_win">LEVEL: 0</span> <br />
+		<br />
+		<input type ="button" value ="CONTINUE" style="width:245px;" onclick="continueGame();" class="button2"><br />
+	</div>
+	
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+	
+	<script>
+	
+	//nX = 0;
+	//nY = 0;
+		
+	playerHealth = 5;
+	playerLevel = 1;
+	
+	gameStarted = false;
+	
+	explosionSheet = new Image();
+	explosionSheet.src = "images/explosion_total.png";
+	
+	soundOn = true;
+	
+	heartEmpty = new Image();
+	heartEmpty.src = "images/heart_empty.png";
+	heartFull = new Image();
+	heartFull.src = "images/heart.png";
+	
+//	nebulaA = new Image();
+//	nebulaA.src = "images/neb1.png";
+	
+	ninja = new Image();
+	ninja.src = "images/ninja_3.png";
+	
+	
+	
+	ship = [];
+	
+	touchText = "";
+	
+	//starScape = new Image();
+	//starFog = new Image();
+	//starScape.src = "images/newStars2.png";
+	//starFog.src = "images/fog2.png"; // starFog
+	
+	star = [];
+	
+	greyShades = 
+	[
+	"#E0E0E0",
+	"#D3D3D3",
+	"#C0C0C0",
+	"#B8B8B8",
+	"#A9A9A9",
+	"#A0A0A0",
+	"#909090",
+	"#696969",
+	"#585858",
+	"#484848",
+	"#282828",
+	//"yellow",
+	//"darkgreen",
+		//"dodgerblue",
+		//"darkred"//,
+	//"nebula"
+	];
+	
+	var colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
+		'#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+		'#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
+		'#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+		'#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
+		'#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+		'#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+		'#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+		'#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
+		'#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'];
+	
+	distanceArray = [0.10,0.25,0.5,0.75,1,1.25];
+	
+	function heavenlyBody(pX,pY)
+	{
+		this.x = pX;
+		this.y = pY;
+		this.dx = 0;
+		this.dy = 0;
+		this.distance = distanceArray[Math.floor(Math.random() * distanceArray.length)];
+		this.radius = Math.floor(Math.random() * 2)+1;
+		
+		if(Math.floor(Math.random() * 10)>9)
+			this.radius = 3;
+		
+		//if(Math.floor(Math.random() * 10)>8)
+		//	this.type = "customStar"
+		//else 
+		this.type = "star";
+		this.colour = greyShades[Math.floor(Math.random() * greyShades.length)];
+		
+		if(Math.floor(Math.random() * 10)>7)
+			this.colour = colorArray[Math.floor(Math.random() * colorArray.length)];
+		
+		var rX = Math.floor(Math.random() * 3000)-1500;
+		
+	}
+	
+	function entity(pX, pY, pType)
+	{
+		this.x = pX;
+		this.y = pY;
+		this.rot = 270;
+		this.dx = 0;
+		this.dy = 0;
+		this.ax = 0;
+		this.ay = 0;
+		this.speed = 0; //8
+		this.maxSpeed = 2; //5
+		this.xSpeed = 6; //8
+		this.jumpPower = 8
+		this.hasGravity = true;
+		this.health = 1;
+		this.energy = 10;
+		
+		this.targetX = 0;
+		this.targetY = 0;
+		
+		this.radius = 32;
+		
+		this.accelerationPower = 0.05; //0.05 //0.2
+		this.turningSpeed = 5;
+		
+		this.image = new Image();
+		this.image.src = "images/ninja_0.png";
+		//this.image.src = "images/small/sab_complete.png";
+		this.frame = 1;
+		this.frameMax = 6;
+		
+		this.team = "enemy";
+		this.type = pType;
+		
+		//stuff just for the player
+		this.wallSlide = false;
+		this.jumpStage = 0;
+		
+		
+		//stuff for monsters/projectiles
+		this.moveTimer = 0;
+		this.moveTimerMax = 3;
+		this.direction = "left";
+		
+		this.specialTimer = 12;
+		this.specialTimerMax = 12;
+		
+		this.weapon = "blaster";
+		this.missiles = 0;
+		
+		this.sparkTimer = 20;
+		this.energyRegenTimer = 0;
+		this.energyRegenTimerMax = 10;
+		
+		if(this.type=="spy")
+		{
+			this.health = 1;
+			this.maxSpeed = 0;
+			this.image.src = "images/ninja_3.png";
+		}
+		else if(this.type=="runner") 
+		{
+			this.health = 1;
+			this.maxSpeed = 4;
+			this.image.src = "images/ninja_0.png";
+		}
+		else if(this.type=="grunt") 
+		{
+			this.health = 1;
+			this.maxSpeed = 2;
+			this.image.src = "images/turtle_0.png";
+		}
+		else if(this.type=="boss") 
+		{
+			this.health = 10;
+			this.maxSpeed = 1;
+			this.image.src = "images/green.png";
+		}
+		
+		else if(this.type=="slider") 
+		{
+			this.team = "enemy";
+			this.image.src = "images/small/sab_1.png";
+			this.accelerationPower = 1; //0.05 //0.2
+			this.turningSpeed = 5;
+			this.maxSpeed = 4;
+			this.turningSpeed = 5;
+			this.weapon = "particle";
+		}
+		else if(this.type=="station") 
+		{
+			this.image.src = "images/small/ss2.png"; //ninja_1 ss2
+			this.team = "player";
+			this.accelerationPower = 0;
+			this.maxSpeed = 0;
+			this.turningSpeed = 0.1; //0.1
+			this.health = 50;
+			this.radius = 175;
+			//alert(this.image.src);
+			this.weapon = "none";
+		}
+		
+		this.maxHealth = this.health;
+		this.maxEnergy = this.energy;
+	
+	}
+	
+	function explosion(pX,pY,t)
+	{
+		this.frame = 0;
+		//this.img = new Image();
+		//this.img.src = "images/"+t+"0.png";
+		this.x = pX;
+		this.y = pY;
+		this.type = t;
+		this.canvas = "primaryCanvas";
+	}
+	
+	function getDist(x, y, x2, y2)
+	{
+		x = x2 - x;
+		y = y2 - y;
+		return Math.floor(Math.sqrt(x * x + y * y));
+	}
+	
+	function wrapText(ctx, text, x, y, maxWidth, lineHeight) 
+	{
+		var words = text.split(' ');
+        var line = '';
+
+        for(var n = 0; n < words.length; n++) 
+		{
+			var testLine = line + words[n] + ' ';
+			var metrics = ctx.measureText(testLine);
+			var testWidth = metrics.width;
+			if (testWidth > maxWidth && n > 0) 
+			{
+				ctx.fillText(line, x, y);
+				line = words[n] + ' ';
+				y += lineHeight;
+			}
+			else 
+			{
+				line = testLine;
+			}
+        }
+        ctx.fillText(line, x, y);
+    }
+	
+	function explodeSomething(x,y,type)
+	{
+		if(type=="spark")
+		{
+			var explosion_colors = ['#FFFF00','#FFD700'];
+			var explosion = new ExplosionClass(x, y, explosion_colors,3); //3
+		}
+		else if(type=="ting")
+		{
+			var explosion_colors = ['blue','aqua','teal'];
+			var explosion = new ExplosionClass(x, y, explosion_colors,4);
+		}
+		else
+		{
+			var explosion_colors = ['orange','red','FireBrick','darkorange'];
+			var explosion = new ExplosionClass(x, y, explosion_colors,8);
+		}
+		/*
+		if(type=="ship")
+		{
+			var explosion_colors = ['orange','red','FireBrick','darkorange'];
+			var explosion = new ExplosionClass(ship[i].x+16, ship[i].y+16, explosion_colors,8);
+		}
+		else if(type=="projectile")
+		{
+			
+		}
+		else if(type=="spark")
+		{
+			var explosion_colors = ['#FFFF00','#FFD700'];
+			var explosion = new ExplosionClass(pro[i].x, pro[i].y, explosion_colors,3);
+		}
+		else if(type=="heal")
+		{
+			var explosion_colors = ['blue','dodgerblue','aqua'];
+			var explosion = new ExplosionClass(player.x, player.y, explosion_colors,3);
+		}
+		*/
+		explosion.ctx = context;
+		explosions.push(explosion);
+		
+	}
+	
+	function targetShip(x,y)
+	{
+		if(gameStarted)
+		{
+		
+			var lethalHit = true;		
+			var targetHit = false;
+			for (var i = 0; i < ship.length; i++)
+			{
+				if(getDist(ship[i].x+16,ship[i].y+16,x,y)<32)
+				{
+					targetHit = true;
+					ship[i].health = ship[i].health - 1;
+					
+					if(ship[i].health > 0)
+						lethalHit = false;
+				}
+							
+			}
+			
+			if(targetHit==false)
+			{
+				explodeSomething(x,y,"spark");
+			}
+			else if((targetHit==true) && (lethalHit==false))
+			{
+				explodeSomething(x,y,"ting");
+			}
+				
+			// If there's exactly one finger inside this element
+			//  if (event.targetTouches.length == 1) 
+			//  {
+			//	var touch = event.targetTouches[0];
+				//touchText = touch.pageX + 'px; ' + touch.pageY + 'px';
+				// Place element where the finger is
+				//obj.style.left = touch.pageX + 'px';
+				//obj.style.top = touch.pageY + 'px';
+			  //}
+		  
+		}
+	}
+	
+	
+	
+	function respawnShip(p)
+	{
+		ship[p].x = 30+ Math.floor(Math.random() * (boundingWidth-80))+boundingX;
+		ship[p].y = 50;
+		if(ship[p].type=="spy")
+			ship[p].y = 50+Math.floor(Math.random() * (boundingHeight-140))+boundingY;
+		ship[p].targetX = Math.floor(Math.random() * boundingWidth)+boundingX;
+		ship[p].targetY = boundingHeight;
+	}
+	
+	var obj = document.getElementById('primaryCanvas');
+	obj.addEventListener('touchmove', function(event) 
+	{
+		if(gameStarted)
+		{
+			var z = 0; //limit touches to the 1st finger 
+			//for (var z = 0; z < event.targetTouches.length; z++)
+			{
+				swipeLength++;
+				if(swipeLength < 20)
+				{
+					var touch = event.targetTouches[z];
+					var x = touch.pageX;
+					var y = touch.pageY;
+					targetShip(x,y);
+				}
+			}
+			
+			//superpower test
+			if((event.targetTouches.length==2) && (swipeLength > 15) && (swipeLength < 20))
+			{
+				swipeLength = 100;
+				for (var i = 0; i < ship.length; i++)
+				{
+					ship[i].health = 0;
+					explodeSomething(ship[i].x,ship[i].y,"boom");
+				}
+			}
+			
+		}
+		
+	}, false);
+			
+	obj.addEventListener('touchstart', function(event) 
+	{
+		
+		//if there is only one finger starting to touch, reset the swipe length 
+		//counter as we are starting a new swipe
+		if(event.targetTouches.length==1)
+			swipeLength = 0;
+		
+		touchText = "";
+		//touchText = "touches: " + event.targetTouches.length;
+		
+		if(gameStarted)
+		{
+			for (var z = 0; z < event.targetTouches.length; z++)
+			{
+				var touch = event.targetTouches[z];
+				var x = touch.pageX;
+				var y = touch.pageY;
+				targetShip(x,y);
+			}
+		}
+		
+	}, false);
+	
+	obj.addEventListener('touchend', function(event) 
+	{
+		/*
+		if(gameStarted)
+		{
+			
+			for (var z = 0; z < event.targetTouches.length; z++)
+			{
+								
+				var touch = event.targetTouches[z];
+				var x = touch.pageX;
+				var y = touch.pageY;
+				targetShip(x,y);
+			}
+		}
+		*/
+		
+	}, false);
+	
+	function canvasClick(event)
+	{
+		if(gameStarted)
+		{
+			var x = event.clientX;
+			var y = event.clientY;
+			targetShip(x,y);
+		}
+	}
+	
+	function continueGame()
+	{
+		gameStarted = true;
+		introScreenDone = true;
+		document.getElementById('menuScreen').style.display = "none";
+		document.getElementById('winScreen').style.display = "none";
+		document.getElementById('loseScreen').style.display = "none";
+		//globalTimer = 60;
+	}
+	
+	function showDefeat()
+	{
+		gameStarted = false;
+		document.getElementById('score_fail').innerHTML = "SCORE: " + playerScore;
+		document.getElementById('level_fail').innerHTML = "LEVEL: " + playerLevel;
+		playerScore = 0;
+		playerLevel = 1;
+		playerHealth = 5;
+		hello();
+		document.getElementById('loseScreen').style.display = "block";
+	}
+	
+	function showActualWin()
+	{
+		gameStarted = false;
+		document.getElementById('score_win').innerHTML = "SCORE: " + playerScore;
+		document.getElementById('level_win').innerHTML = "LEVEL: " + playerLevel;
+		playerLevel++;
+		hello();
+		document.getElementById('winScreen').style.display = "block";
+	}
+	
+	function showWin()
+	{
+		finalCountdown = 1;
+	}
+	
+	function startingSetup()
+	{
+		
+		//TryPlay("mayhem");
+		gameStarted = false;
+		introScreenDone = false;
+		waveMode = false;
+		document.getElementById('menuScreen').style.display = "block";
+		document.getElementById('loseScreen').style.display = "none";
+		document.getElementById('winScreen').style.display = "none";
+		
+		var w = window,
+		d = document,
+		e = d.documentElement,
+		g = d.getElementsByTagName('body')[0],
+		x = w.innerWidth || e.clientWidth || g.clientWidth,
+		y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+		//alert(x + ' × ' + y);
+				
+		canvas = document.getElementById("primaryCanvas");
+		canvas.width = x-50; //1920
+		canvas.height = y-30; //900
+		
+		boundingX = 0;
+		boundingY = 0;
+		boundingWidth = x-30;
+		boundingHeight = y-30;
+		
+		context = document.getElementById('primaryCanvas').getContext('2d');
+		
+		
+		
+		//nX = Math.floor(Math.random() * boundingWidth)+boundingX;;
+		//nY = Math.floor(Math.random() * boundingHeight)+boundingY;;
+		playerScore = 0;
+		globalTimer = 60;
+		enemiesLeft = 20;
+		
+		shipDY = 0;
+		shipDX = 0;
+		shipX = 10;
+		shipY = 10;
+		starX = 0;
+		starY = 0;
+		fogX = 0;
+		fogY = 0;
+		
+		screenShakeDuration = 0;
+		
+		finalCountdown = 5000;
+		
+		lightningCounter = 0;
+		starTimer = 0;
+		starX = 0;
+		starX_right = 1920;
+		fogX = 0;
+		fogX_right = 1920;
+		backX = 3000;
+		
+		
+		player = new entity(528,488,"player");
+		player.dx = 0;
+		player.dy = -1;
+		
+		star = [];
+		for (var i = 0; i < 270; i++) //500 //270
+		{
+			var rX = Math.floor(Math.random() * boundingWidth)+boundingX;
+			var rY = Math.floor(Math.random() * boundingHeight)+boundingY;
+			star[star.length] = new heavenlyBody(rX,rY);
+		}
+		
+		playerHealth = 5;
+		hello();
+	}
+	
+	function hello()
+	{
+		
+		gameStarted = false;
+		finalCountdown = 5000;
+		
+		chainActive = false;
+		chainLength = 0;
+		chainX = 0;
+		
+		swipeLength = 0;
+		
+		exp = [];
+		ship = [];
+		
+		globalTimer = 60;
+		
+		if(playerLevel<=1)
+		{
+			globalTimer = 10;
+			enemiesLeft = 10; // 10;
+			ship[0] = new entity(0,0,"spy");
+			ship[1] = new entity(0,0,"spy");
+			ship[2] = new entity(0,0,"spy");
+			ship[3] = new entity(0,0,"grunt");
+		}
+		
+		else if(playerLevel==2)
+		{
+			globalTimer = 20;
+			enemiesLeft = 20; //20;
+			ship[0] = new entity(0,0,"spy");
+			ship[1] = new entity(0,0,"spy");
+			ship[2] = new entity(0,0,"grunt");
+			ship[3] = new entity(0,0,"grunt");
+		}
+		
+		else if(playerLevel==3)
+		{
+			globalTimer = 30;
+			enemiesLeft = 30;
+			waveMode = true;
+			//ship[0] = new entity(0,0,"grunt");
+			//ship[1] = new entity(0,0,"grunt");
+			//ship[2] = new entity(0,0,"grunt");
+			//ship[3] = new entity(0,0,"grunt");
+		}
+		
+		else if(playerLevel==4)
+		{
+			globalTimer = 40;
+			enemiesLeft = 40;
+			waveMode = false;
+			ship[0] = new entity(0,0,"boss");
+			ship[1] = new entity(0,0,"boss");
+			ship[2] = new entity(0,0,"grunt");
+			ship[3] = new entity(0,0,"grunt");
+			ship[4] = new entity(0,0,"grunt");
+		}
+		
+		else if(playerLevel==5)
+		{
+			globalTimer = 50;
+			enemiesLeft = 50;
+			ship[0] = new entity(0,0,"runner");
+			ship[1] = new entity(0,0,"runner");
+			ship[2] = new entity(0,0,"grunt");
+			ship[3] = new entity(0,0,"grunt");
+			ship[4] = new entity(0,0,"grunt");
+		}
+		
+		else
+		{
+			globalTimer = 60;
+			enemiesLeft = 60;
+			//waveMode = true;
+			ship[0] = new entity(0,0,"runner");
+			ship[1] = new entity(0,0,"grunt");
+			ship[2] = new entity(0,0,"grunt");
+			ship[3] = new entity(0,0,"boss");
+			ship[4] = new entity(0,0,"grunt");
+			ship[5] = new entity(0,0,"grunt");
+		}
+		
+		//ship = [];
+		//for (var i = 0; i < 100; i++)
+		//{
+		//	ship[ship.length] = new entity(10,10,"spy");
+		//}
+		
+		for (var i = 0; i < ship.length; i++)
+		{
+			respawnShip(i);
+		}
+		
+		//playerScore = 0;
+		
+		
+		
+		screenShakeDuration = 0;
+		
+		
+		/*
+		player = new entity(528,488,"player");
+		player.dx = 0;
+		player.dy = -1;
+		
+		star = [];
+		for (var i = 0; i < 270; i++) //500 //270
+		{
+			var rX = Math.floor(Math.random() * boundingWidth)+boundingX;
+			var rY = Math.floor(Math.random() * boundingHeight)+boundingY;
+			star[star.length] = new heavenlyBody(rX,rY);
+		}
+		*/
+		
+		
+		
+	}
+	
+	function drawStars()
+	{
+		//do literally nothing 
+		//drawR(scoutShip[engineFrame],player.x-cameraX,player.y-cameraY,player.rot+90,"primaryCanvas")
+		
+		for (var i = 0; i < star.length; i++)
+		{
+			//context.drawImage(turretImage,star[i].x-cameraX, star[i].y-cameraY);
+			
+			//new way, move the whole universe.
+			star[i].dx = player.dx*star[i].distance*-1;
+			star[i].dy = player.dy*star[i].distance*-1;
+			star[i].x = star[i].x + star[i].dx;
+			star[i].y = star[i].y + star[i].dy;
+			
+			//if((introScreenDone==true) && (gameStarted==false))
+			if(document.getElementById("winScreen").style.display == "block")
+				context.fillStyle = document.getElementById("titleText").style.color
+			else if(document.getElementById("loseScreen").style.display == "block")
+				context.fillStyle = "darkred";
+			else
+				context.fillStyle = star[i].colour;
+				
+			//context.fillRect(star[i].x, star[i].y,2,2);
+			//if(variableStarSize)
+			//{
+				//if(star[i].type=="star")
+					context.fillRect(star[i].x, star[i].y,star[i].radius,star[i].radius);
+				//else
+				//	context.drawImage(customStar[star[i].radius],star[i].x, star[i].y);
+				
+				
+				//if(star[i].radius>=3)
+				//	context.globalAlpha = 0.3;
+				//context.fillRect(star[i].x, star[i].y,star[i].radius,star[i].radius);
+				//context.globalAlpha = 1;
+				//customStar
+				
+			//}
+			//else
+			//	context.fillRect(star[i].x, star[i].y,2,2);
+			
+			//if(star[i].colour=="nebula")
+			//	context.drawImage(nebulaA,star[i].x-cameraX, star[i].y-cameraY);
+			
+			
+			//}
+			//old way, draw stars where they are
+			//context.fillRect(star[i].x-cameraX, star[i].y-cameraY,2,2);
+			
+			
+			//context.strokeStyle = star[i].colour;
+			
+			//context.beginPath();
+            //context.arc(star[i].x-cameraX, star[i].y-cameraY, star[i].radius, 0, 2 * Math.PI, false);
+            //context.fill();
+            //context.stroke();
+			
+		}
+		
+		//reposition stars that leave the bounding box
+		for (var i = star.length-1; i >= 0; i--)
+		{
+			//if	(
+			//		(star[i].x<boundingX) || (star[i].y<boundingY) ||
+			//		(star[i].x>boundingX+boundingWidth) || (star[i].y>boundingY+boundingHeight)
+			//	)
+			//	star[i].colour = "limegreen";
+				
+			if(star[i].x<boundingX)
+				star[i].x = boundingX+boundingWidth;
+			else if(star[i].x>boundingX+boundingWidth)
+				star[i].x = boundingX;
+			if(star[i].y<boundingY)
+				star[i].y = boundingY+boundingHeight;
+			else if(star[i].y>boundingY+boundingHeight)
+			{
+				star[i].y = boundingY;
+				star[i].colour = greyShades[Math.floor(Math.random() * greyShades.length)];
+				if(Math.floor(Math.random() * 10)>7)
+					star[i].colour  = colorArray[Math.floor(Math.random() * colorArray.length)];
+			}
+		}
+		
+		//draw planets and nebulae
+		/*
+		for (var i = 0; i < planet.length; i++)
+		{
+			if(planet[i].type == "planet_redblue")
+				context.drawImage(planetImg[0],planet[i].x-cameraX,planet[i].y-cameraY)
+			else if (planet[i].type == "planet_blue")
+				context.drawImage(planetImg[1],planet[i].x-cameraX,planet[i].y-cameraY)
+			else if (planet[i].type == "moon_red")
+				context.drawImage(planetImg[2],planet[i].x-cameraX,planet[i].y-cameraY);
+				
+			if(planet[i].type == "nebulaA")
+				context.drawImage(nebulaA,planet[i].x-cameraX,planet[i].y-cameraY)
+			else if (planet[i].type == "nebulaB")
+				context.drawImage(nebulaB,planet[i].x-cameraX,planet[i].y-cameraY)
+			else if (planet[i].type == "nebulaC")
+				context.drawImage(nebulaC,planet[i].x-cameraX,planet[i].y-cameraY);
+		}
+		*/
+		
+	}
+	
+	function old_drawStars()
+	{
+	
+		
+		starX = 0;
+		
+		document.getElementById('primaryCanvas').getContext('2d').drawImage(starScape, starX, 0);
+		document.getElementById('primaryCanvas').getContext('2d').drawImage(starScape, starX_right, 0);
+		document.getElementById('primaryCanvas').getContext('2d').drawImage(starFog, fogX, 0);
+		document.getElementById('primaryCanvas').getContext('2d').drawImage(starFog, fogX_right, 0);
+		//document.getElementById('primaryCanvas').getContext('2d').drawImage(cloudImg, fogX, 0);
+		//document.getElementById('primaryCanvas').getContext('2d').drawImage(cloudImg, fogX_right, 0);
+		
+		//document.getElementById('primaryCanvas').getContext('2d').drawImage(cloudImg, 0, 0);
+		
+		
+		enginesOn = 0.5;
+				
+		
+		if(starTimer == 3)
+		{
+			starTimer = 0;
+			fogX = fogX - (0.3*enginesOn)-0.3 -1;
+			fogX_right = fogX_right - (0.3*enginesOn)-0.3 -1; //-2
+			
+			if(fogX<=-1920)
+				fogX=1920;
+				
+			if(fogX_right<=-1920)
+			fogX_right=1920;
+		
+		}
+		
+		if(starTimer == 1)
+		{
+			/*
+			starTimer = 0;
+			starX_right = starX_right - (0.3*enginesOn);// -0.3;
+			starX = starX - (0.3*enginesOn);//-0.3;
+			
+			if(starX<=-1920)
+				starX=1920;
+				
+			if(starX_right<=-1920)
+				starX_right=1920;
+			*/			
+			
+		}
+		starTimer = starTimer +1;
+	
+	}
+	
+	function preShake() 
+	{
+	  context.save();
+	  var dx = Math.random()*10;
+	  var dy = Math.random()*10;
+	  context.translate(dx, dy);  
+	}
+	
+	function postShake() 
+	{
+		context.restore();
+	}
+	
+	function drawCamera()
+	{
+		
+		//var canvas = document.getElementById("primaryCanvas");
+		//var context = document.getElementById("primaryCanvas").getContext('2d');
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		
+		
+		//old_drawStars();
+		drawStars();
+		
+		
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(explosionSheet, 0, 0);
+	//	document.getElementById("primaryCanvas").getContext('2d').drawImage(nebulaA, -150, -150);
+		
+		
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(ninja, nX, nY);
+		
+		if(gameStarted)
+		{
+		
+			for (var i = 0; i < ship.length; i++)
+			{
+				drawR(ship[i].image,ship[i].x,ship[i].y,ship[i].rot+90,"primaryCanvas")
+			}
+		
+		}
+		//draw explosions
+		for (var i = exp.length-1; i >= 0; i--)
+		{
+			document.getElementById(exp[i].canvas).getContext('2d').drawImage(explosionSheet, 50*exp[i].frame, 0, 50, 50, exp[i].x-35, exp[i].y-35, 50, 50);
+			
+			exp[i].frame = exp[i].frame + 1;
+			if(exp[i].frame==11)
+			{
+				exp.splice(i,1);
+			}
+		}
+		
+		exp_update();
+		
+		sCurr = "SCORE: " + playerScore;
+		var maxWidth = 500;//400
+		var lineHeight = 25;
+		
+		//context.font = '16pt Calibri';
+		//context.fillStyle = 'white';
+		
+		//context.font = "30px Arial";
+		context.font = '16pt Calibri';
+		if(screenShakeDuration>0)
+			context.fillStyle = 'red';
+		else
+			context.fillStyle = 'darkred';
+		
+		if(gameStarted)
+		{
+		
+			wrapText(context, sCurr, (boundingWidth/2)-30, boundingHeight-50, maxWidth, lineHeight);
+			context.fillStyle = 'white';
+			
+			//wrapText(context, "TIMER: " +globalTimer, (boundingWidth/2)-30, 25, maxWidth, lineHeight);
+			wrapText(context, "ENEMIES LEFT: " +enemiesLeft, (boundingWidth/2)-80, 25, maxWidth, lineHeight);
+			
+			//maxWidth = 300;
+			//wrapText(context, touchText, 25, 50, maxWidth, lineHeight);
+		
+			//playerHealth = 10;
+		
+			startingX = (playerHealth*16)-16;
+			for (var i = 0; i < playerHealth; i++)
+			{
+				document.getElementById("primaryCanvas").getContext('2d').drawImage(heartFull, startingX+(boundingWidth/2)-(32*i), boundingHeight-40);
+			}
+		
+		}
+		
+		
+		
+	}
+	
+	function rotateA2B(a,b)
+	{
+		x2 = b.x;
+		y2 = b.y;
+		x1 = a.x;
+		y1 = a.y;
+		
+		var deltaX = x2 - x1;
+		var deltaY = y2 - y1;
+		var rad = Math.atan2(deltaY, deltaX);
+		var deg = rad * (180 / Math.PI)
+		
+		a.rot = deg;
+		
+	}
+	
+	function rotateShipToMouseXY(pShip)
+	{
+		//rotate player ship to face mouse cursor
+		x2 = adjustedMouseX;
+		y2 = adjustedMouseY;
+		x1 = pShip.x;
+		y1 = pShip.y;
+		
+		var deltaX = x2 - x1;
+		var deltaY = y2 - y1;
+		var rad = Math.atan2(deltaY, deltaX);
+		var deg = rad * (180 / Math.PI)
+		
+		pShip.rot = deg;
+	}
+	
+	function changeRotation(rot,change)
+	{
+		extraRot = 0;
+		rot=rot+change;
+		if(rot>360)
+		{
+			extraRot = rot-360;
+			rot = 0+extraRot;
+		}
+		else if(rot<0)
+		{
+			extraRot = rot*-1;
+			rot = 360 - extraRot;
+		}
+		return(rot);
+	}
+	
+	function toRadians (angle) 
+	{
+		return angle * (Math.PI / 180);
+	}
+	
+	function drawR(image,x,y,rot,c)
+	{
+		//if(withinBounds(x,y))
+	//	if(withinBoundsWH(x,y,image.width,image.height))
+		{
+			var canvas = document.getElementById(c);
+			var context = document.getElementById(c).getContext('2d');
+			
+			//var x = 748;//canvas.width / 2;
+			//var y = 567;//canvas.height / 2;
+			var width = image.width;
+			var height = image.height;
+
+			angleInRadians = toRadians(rot);
+			
+			context.translate(x, y);
+			context.rotate(angleInRadians);
+			context.drawImage(image, -width / 2, -height / 2, width, height);
+			context.rotate(-angleInRadians);
+			context.translate(-x, -y);
+		}
+	}
+	
+	function handleShipMovement()
+	{
+		//for (var i = ship.length-1; i >= 0; i--)
+		for (var i = 0; i < ship.length; i++)
+		{
+			
+			//////////////////
+			//handle turning 
+			//////////////////
+			
+			if(waveMode)
+			{
+				//don't rotate the ships
+				//ship[i].rot = changeRotation(ship[i].rot,ship[i].turningSpeed);
+			}
+			else
+			{
+			
+				x2 = ship[i].targetX;//player.x;
+				y2 = ship[i].targetY;//player.y;
+				x1 = ship[i].x;
+				y1 = ship[i].y;
+				
+				var deltaX = x2 - x1;
+				var deltaY = y2 - y1;
+				var rad = Math.atan2(deltaY, deltaX);
+				var deg = rad * (180 / Math.PI)
+				
+				idealRotation = deg;
+				if(deg < 0)
+					idealRotation = 360+deg;
+				
+				idealRotation = Math.floor(idealRotation);
+				var turning = true;
+				var leftTurnRot = Math.floor(ship[i].rot);
+				var leftTurn = 0;
+				while(turning)
+				{
+					leftTurn++;
+					
+					leftTurnRot = changeRotation(leftTurnRot,-1);
+					
+					if(leftTurnRot==idealRotation)
+						turning = false;
+									
+					if(leftTurn>370)
+					{
+						//alert(idealRotation + ";" + leftTurn + ";" + rightTurn);
+						turning = false;
+					}
+				}
+				
+				var turning = true;
+				var rightTurnRot = Math.floor(ship[i].rot);
+				var rightTurn = 0;
+				while(turning)
+				{
+					rightTurn++;
+					
+					rightTurnRot = changeRotation(rightTurnRot,1);
+				
+					if(rightTurnRot==idealRotation)
+						turning = false;
+
+					if(rightTurn>370)
+					{
+						//alert(idealRotation + ";" + leftTurn + ";" + rightTurn);
+						turning = false;
+					}
+				}
+				
+				if(leftTurn<rightTurn)
+					ship[i].rot = changeRotation(ship[i].rot,-ship[i].turningSpeed)
+				else
+					ship[i].rot = changeRotation(ship[i].rot,ship[i].turningSpeed)
+				
+					
+				if(i==0)
+				{
+					//rotDetail = xDiff + ";" + yDiff;
+					//rotDetail = Math.floor(ship[i].rot)+ "; " + Math.floor(idealRotation) + "; " + Math.floor(dif);
+					//rotDetail = idealRotation + ";" + leftTurn + ";" + rightTurn;
+				}
+			
+			}
+		
+		
+		
+		
+			//////////////////
+			//handle thrust 
+			//////////////////
+			//thrust
+			if(true)
+			{
+				ship[i].ax = Math.cos(ship[i].rot*Math.PI/180)*ship[i].accelerationPower;
+				ship[i].ay = Math.sin(ship[i].rot*Math.PI/180)*ship[i].accelerationPower;
+			}
+			else
+			{
+				//no acceleration is being applied, so cancel acceleration
+				ship[i].ax = 0;
+				ship[i].ay = 0;
+			}
+			
+			
+			//update velocity
+			ship[i].dx += ship[i].ax;
+			ship[i].dy += ship[i].ay;
+			
+			var tempDX = ship[i].dx;
+			var tempDY = ship[i].dy;
+			
+			tempSpeed = Math.sqrt(tempDX * tempDX + tempDY * tempDY);
+			if (tempSpeed > ship[i].maxSpeed) 
+			{
+				//the resulting speed is always <= maxspeed (normed to that)
+				//ship[i].dy *= ship[i].maxSpeed/tempSpeed;
+				//ship[i].dx *= ship[i].maxSpeed/tempSpeed;
+				
+				ship[i].dy /= tempSpeed/ship[i].maxSpeed;
+				ship[i].dx /= tempSpeed/ship[i].maxSpeed;
+			}
+			
+			
+			//decrease speed due to friction/brakes
+			if (false)
+			{	
+				
+				ship[i].dy *= playerFriction;
+				if(((ship[i].dy > 0) && (ship[i].dy < 1)) || ((ship[i].dy < 0) && (ship[i].dy > -1)))
+					ship[i].dy = 0;
+				ship[i].dx *= playerFriction;
+				if(((ship[i].dx > 0) && (ship[i].dx < 1)) || ((ship[i].dx < 0) && (ship[i].dx > -1)))
+					ship[i].dx = 0;
+			}
+					
+			
+			//update position
+			ship[i].x = ship[i].x + ship[i].dx;
+			ship[i].y = ship[i].y + ship[i].dy;
+			
+			
+			if(ship[i].y > boundingHeight)
+			{
+				respawnShip(i);
+				
+				screenShakeDuration = 15;
+				playerHealth--;
+				if(playerHealth <= 0)
+				{
+					showDefeat();
+				}
+				else
+				{
+					//enemiesLeft--;
+					ship[i].health = 5000;
+				}
+			}
+			
+			if(ship[i].x > boundingWidth)
+				ship[i].dx *= -1;
+			
+			if(ship[i].x < 0)
+				ship[i].dx *= -1;
+			
+			//out of map bounds 
+			/*
+			if(ship[i].x > 1900)
+				ship[i].dx *= -1;
+			
+			if(ship[i].y > 900)
+				ship[i].dy *= -1;
+			
+			if(ship[i].x < 0)
+				ship[i].dx *= -1;
+			
+			if(ship[i].y < 0)
+				ship[i].dy *= -1;
+			*/
+		
+			
+		
+		}
+	}
+	
+	function handleGameLogic()
+	{
+	
+		for (var i = ship.length-1; i >= 0; i--)
+		{
+			
+			if(waveMode)
+			{
+				if(ship[i].health <= 0)
+				{
+					
+					playerScore = playerScore + 1;
+					screenShakeDuration = 15;
+							
+					exp[exp.length] = new explosion(ship[i].x+16,ship[i].y+16,"exp");
+					
+					
+					enemiesLeft--;
+					
+					
+					ship.splice(i,1);
+					
+					if(enemiesLeft<=0)
+						showWin();
+					
+					
+						
+					
+				}
+				else if((ship[i].health == 5000) && (playerHealth > 0))
+				{
+					enemiesLeft--;
+					ship.splice(i,1);
+					if(enemiesLeft<=0)
+						showWin();
+				}
+
+			}
+			else 
+			{
+				if(ship[i].health <= 0)
+				{
+					
+					playerScore = playerScore + 1;
+					screenShakeDuration = 15;
+							
+					exp[exp.length] = new explosion(ship[i].x+16,ship[i].y+16,"exp");
+					
+					if(ship[i].type=="boss")
+						ship[i].health = 10
+					else
+						ship[i].health = 1;
+					
+					respawnShip(i);
+					
+					
+					enemiesLeft--;
+					
+					if(ship.length > enemiesLeft)
+						ship.splice(i,1);
+					
+					if(enemiesLeft<=0)
+						showWin();
+					
+					
+						
+					
+				}
+				else if((ship[i].health == 5000) && (playerHealth > 0))
+				{
+					enemiesLeft--;
+					
+					if(ship[i].type=="boss")
+						ship[i].health = 10
+					else
+						ship[i].health = 1;
+						
+					if(ship.length > enemiesLeft)
+						ship.splice(i,1);
+					if(enemiesLeft<=0)
+						showWin();
+				}
+			
+			}
+		}
+	
+	}
+	
+	function update()
+	{
+		
+		//drawCamera();
+		
+		if(gameStarted)
+			handleShipMovement();
+		
+		if(screenShakeDuration>0)
+		{
+			screenShakeDuration--;
+			preShake();
+			drawCamera();
+			postShake();
+		}
+		else
+			drawCamera();
+		
+		handleGameLogic();
+		
+		requestAnimationFrame(update);
+	}
+	
+	function timedInterval()
+	{
+		
+		if(document.getElementById("winScreen").style.display == "block")
+		{
+		
+			if(document.getElementById("titleText").style.color == "orange")
+				document.getElementById("titleText").style.color = "gold"
+			else if (document.getElementById("titleText").style.color == "gold")
+				document.getElementById("titleText").style.color = "lime"
+			else if (document.getElementById("titleText").style.color == "lime")
+				document.getElementById("titleText").style.color = "aqua"
+			else if (document.getElementById("titleText").style.color == "aqua")
+				document.getElementById("titleText").style.color = "violet"	
+			else if (document.getElementById("titleText").style.color == "violet")
+				document.getElementById("titleText").style.color = "red"
+			else if (document.getElementById("titleText").style.color == "red")
+				document.getElementById("titleText").style.color = "orange";
+		}
+		
+		else if(document.getElementById("loseScreen").style.display == "block")
+		{
+			document.getElementById("titleText").style.color = "red";
+			explodeSomething(30+ Math.floor(Math.random() * (boundingWidth-80))+boundingX,50+Math.floor(Math.random() * (boundingHeight-140))+boundingY,"boom");
+		}
+		
+		if(gameStarted)
+		{
+			
+			//give a slight delay after killing the last enemy of the wave 
+			//so we can see their death throes before showing the win screen
+			if(finalCountdown != 5000)
+				finalCountdown--;
+			if(finalCountdown <=0)
+				showActualWin();
+			
+			globalTimer--;
+			
+			if(waveMode)
+			{
+				if((enemiesLeft > ship.length) && (playerLevel >= 3))
+				{
+					if(chainActive==false)
+					{
+						chainActive = true;
+						chainLength = 3;
+						chainX =  30+ Math.floor(Math.random() * (boundingWidth-80))+boundingX;
+						
+					}
+					
+					if(chainActive)
+					{
+						chainLength--;
+						if(chainLength==0)
+							chainActive = false;
+						
+						if(playerLevel>=6)
+							ship[ship.length] = new entity(0,0,"runner")
+						else
+							ship[ship.length] = new entity(0,0,"grunt");
+						respawnShip(ship.length-1);
+						
+						ship[ship.length-1].rot = 90; //270
+						ship[ship.length-1].x = chainX;
+						ship[ship.length-1].y = 50;
+						ship[ship.length-1].targetX = chainX;
+						ship[ship.length-1].targetY = boundingHeight;
+					}
+					
+				}
+			}
+			
+			if(globalTimer < 0)
+			{
+				//doNothing()
+				//showWin();
+				
+				
+			}
+		}
+	}
+	
+	function TryPlay(s)
+	{
+
+		/*if ((s == "track1") || (s == "track2") || (s == "track3") || (s == "track4"))
+		{
+
+			if (musicOn)
+				document.getElementById(s).play();
+
+			currentTrack = s;
+		}
+
+		else */if (soundOn)
+		{
+			//if you want the same sound to reset it's look so it always plays, uncomment
+			//document.getElementById(s).currentTime = 0;
+			document.getElementById(s).play();
+			
+		}
+	}
+	
+	window.addEventListener("load", function()
+	{
+		update();
+	});
+	
+	window.setInterval(timedInterval, 50000 / 60);
+	
+	</script>
+	
+	<script src="rot.js"></script>
+	
+	<script type="text/javascript" src="core.js"></script>
+	<script type="text/javascript" src="explosion_html5.js"></script>
+	
+	<!--
+	<audio id="mayhem" preload="auto">
+        <source src="audio/8-Bit-Mayhem.mp3" type="audio/mp3">
+    </audio>
+	-->
+</body>
+
+</html>
