@@ -318,10 +318,11 @@
 	<canvas id="primaryCanvas" class="primaryCanvas" onclick="canvasClick(event)"></canvas>
 	
 	<div id="menuScreen" class="menuScreen center">
-		<span id="menuTitle" class="titleText" style="color:orange">P A N I C</span>
+		<span id="menuTitle" class="titleText rainbow-text" style="color:orange">PANIC TRAIN</span>
 		<br />
+		<img width="250px" src="images/TK/splash.jpg">
 		<br />
-		<span id="output">Prevent the enemy from breaching our defenses.</span> <br />
+		<span id="output" class="rainbow-text">No stops. No brakes. Only death.</span> <br />
 		<br />
 		<input type ="button" value ="START" style="width:245px;" onclick="continueGame();" class="button2"><br />
 	</div>
@@ -329,8 +330,9 @@
 	<div id="loseScreen" class="menuScreen center">
 		<span class="titleText" style="color:red">GAME OVER</span>
 		<br />
+		<img width="250px" src="images/TK/fail.jpg"> 
 		<br />
-		<span id="output_fail">You failed to stop the enemy.</span> <br />
+		<span id="output_fail">The train has ground to a halt.</span> <br />
 		<br />
 		<span id="score_fail">SCORE: 0</span> <br />
 		<span id="level_fail">LEVEL: 0</span> <br />
@@ -341,8 +343,9 @@
 	<div id="winScreen" class="menuScreen center">
 		<span class="titleText" id="titleText" style="color:orange">V I C T O R Y</span>
 		<br />
+		<img width="250px" src="images/TK/win.jpg">
 		<br />
-		<span id="output_win">You successfully survived the wave.</span> <br />
+		<span id="output_win">Choo choo motherfuckers.</span> <br />
 		<br />
 		<span id="score_win">SCORE: 0</span> <br />
 		<span id="level_win">LEVEL: 0</span> <br />
@@ -360,74 +363,31 @@
 	
 	//nX = 0;
 	//nY = 0;
+	
+	/*
+	pressing keys to lay tracks
+	Concentric ring explosions [think shelling]
+	Fans/zombies rushing the train
+	upgrades
+	
+	*/
+	
+	function tile(pForeground, pBackground, pHealth, pSolid)
+	{
+		this.f = pForeground;
+		this.b = pBackground;
+		this.detected = "na";
+		this.health = pHealth;
+		this.solid = pSolid;
+		this.light = 1;;
+		this.charCol = "white";
+		this.frame = 0;
+		this.bgFrame = 0;
+		this.special = 0;
+		this.x = 0;
+		this.y = 0;
+	}
 		
-	playerHealth = 5;
-	playerLevel = 1;
-	
-	gameStarted = false;
-	
-	explosionSheet = new Image();
-	explosionSheet.src = "images/explosion_total.png";
-	
-	soundOn = true;
-	
-	heartEmpty = new Image();
-	heartEmpty.src = "images/heart_empty.png";
-	heartFull = new Image();
-	heartFull.src = "images/heart.png";
-	
-//	nebulaA = new Image();
-//	nebulaA.src = "images/neb1.png";
-	
-	ninja = new Image();
-	ninja.src = "images/ninja_3.png";
-	
-	
-	
-	ship = [];
-	
-	touchText = "";
-	
-	//starScape = new Image();
-	//starFog = new Image();
-	//starScape.src = "images/newStars2.png";
-	//starFog.src = "images/fog2.png"; // starFog
-	
-	star = [];
-	
-	greyShades = 
-	[
-	"#E0E0E0",
-	"#D3D3D3",
-	"#C0C0C0",
-	"#B8B8B8",
-	"#A9A9A9",
-	"#A0A0A0",
-	"#909090",
-	"#696969",
-	"#585858",
-	"#484848",
-	"#282828",
-	//"yellow",
-	//"darkgreen",
-		//"dodgerblue",
-		//"darkred"//,
-	//"nebula"
-	];
-	
-	var colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
-		'#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
-		'#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
-		'#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
-		'#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
-		'#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
-		'#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
-		'#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
-		'#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
-		'#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'];
-	
-	distanceArray = [0.10,0.25,0.5,0.75,1,1.25];
-	
 	function heavenlyBody(pX,pY)
 	{
 		this.x = pX;
@@ -570,6 +530,112 @@
 		this.type = t;
 		this.canvas = "primaryCanvas";
 	}
+	
+	mapWidth = 10; //33 //20
+	mapHeight = 10
+	
+	map = [];
+	for (x = 0; x < mapWidth; x++)
+	{
+		map[x] = [];
+		for (y = 0; y < mapHeight; y++)
+		{
+			map[x][y] = new tile(".", "d", "500", true);
+		}
+	}
+	tileSize = 32;
+	
+	trainBody = new Image();
+	trainBody.src = "images/trainBody.png";
+	
+	trainTurret = new Image();
+	trainTurret.src = "images/trainTurret.png";
+	
+	trainPlain = new Image();
+	trainPlain.src = "images/trainPlain.png";
+	
+	playerHealth = 5;
+	playerLevel = 1;
+	
+	gameStarted = false;
+	
+	explosionSheet = new Image();
+	explosionSheet.src = "images/explosion_total.png";
+	
+	soundOn = true;
+	
+	heartEmpty = new Image();
+	heartEmpty.src = "images/heart_empty.png";
+	heartFull = new Image();
+	heartFull.src = "images/heart.png";
+	
+//	nebulaA = new Image();
+//	nebulaA.src = "images/neb1.png";
+	
+	ninja = new Image();
+	ninja.src = "images/ninja_3.png";
+	
+	dirt = new Image();
+	dirt.src = "images/dirt.png";
+	
+	dirtB = new Image();
+	dirtB.src = "images/dirt1.png";
+	
+	dirtC = new Image();
+	dirtC.src = "images/dirt2.png";
+	
+	stone = new Image();
+	stone.src = "images/stone1.png";
+	
+	rail = new Image();
+	rail.src = "images/rail.png";
+	
+	ship = [];
+	
+	touchText = "";
+	
+	//starScape = new Image();
+	//starFog = new Image();
+	//starScape.src = "images/newStars2.png";
+	//starFog.src = "images/fog2.png"; // starFog
+	
+	star = [];
+	
+	greyShades = 
+	[
+	"#E0E0E0",
+	"#D3D3D3",
+	"#C0C0C0",
+	"#B8B8B8",
+	"#A9A9A9",
+	"#A0A0A0",
+	"#909090",
+	"#696969",
+	"#585858",
+	"#484848",
+	"#282828",
+	//"yellow",
+	//"darkgreen",
+		//"dodgerblue",
+		//"darkred"//,
+	//"nebula"
+	];
+	
+	var colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
+		'#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+		'#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
+		'#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+		'#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
+		'#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+		'#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
+		'#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+		'#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
+		'#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'];
+	
+	distanceArray = [0.10,0.25,0.5,0.75,1,1.25];
+	
+	
+	
 	
 	function getDist(x, y, x2, y2)
 	{
@@ -854,11 +920,44 @@
 		
 		
 		
+		mapWidth = (boundingWidth/tileSize); //33 //20
+		mapHeight = (boundingHeight/tileSize)+3;
+		
+		map = [];
+		for (x = 0; x < mapWidth; x++)
+		{
+			map[x] = [];
+			for (y = 0; y < mapHeight; y++)
+			{
+				map[x][y] = new tile(".", "d", "500", true);
+				map[x][y].x = x*tileSize;
+				map[x][y].y = y*tileSize;
+				var r = Math.floor(Math.random()*3); //4
+				if(r==0)
+					map[x][y].f = "a"
+				else if(r==1)
+					map[x][y].f = "b"
+				else if(r==2)
+					map[x][y].f = "c"
+				else if(r==3)
+					map[x][y].f = "d";
+				
+			}
+		}
+		
+		x = 7;
+		for (y = 0; y < mapHeight; y++)
+		{
+			map[x][y].b = "r";
+		}
+		
 		//nX = Math.floor(Math.random() * boundingWidth)+boundingX;;
 		//nY = Math.floor(Math.random() * boundingHeight)+boundingY;;
 		playerScore = 0;
 		globalTimer = 60;
 		enemiesLeft = 20;
+		
+		distanceTravelled = 0;
 		
 		shipDY = 0;
 		shipDX = 0;
@@ -894,7 +993,7 @@
 			star[star.length] = new heavenlyBody(rX,rY);
 		}
 		
-		playerHealth = 5;
+		playerHealth = 1;
 		hello();
 	}
 	
@@ -1207,8 +1306,51 @@
 		
 		//document.getElementById("primaryCanvas").getContext('2d').drawImage(ninja, nX, nY);
 		
+			
+		
 		if(gameStarted)
 		{
+		
+			//document.getElementById("primaryCanvas").getContext('2d').drawImage(dirt, 50, 50);
+		
+			for (x = 0; x < mapWidth; x++)
+			{
+				for (y = 0; y < mapHeight; y++)
+				{
+					/*
+					if(map[x][y].f=="a")
+						context.drawImage(dirt, x*tileSize, y*tileSize)
+					else if(map[x][y].f=="b")
+						context.drawImage(dirtB, x*tileSize, y*tileSize)
+					else if(map[x][y].f=="c")
+						context.drawImage(dirtC, x*tileSize, y*tileSize)
+					else if(map[x][y].f=="d")
+						context.drawImage(heartFull, x*tileSize, y*tileSize);
+					*/
+					if(map[x][y].f=="a")
+						context.drawImage(dirt, map[x][y].x, map[x][y].y)
+					else if(map[x][y].f=="b")
+						context.drawImage(dirtB, map[x][y].x, map[x][y].y)
+					else if(map[x][y].f=="c")
+						context.drawImage(dirtC, map[x][y].x, map[x][y].y)
+					else if(map[x][y].f=="d")
+						context.drawImage(stone, map[x][y].x, map[x][y].y);	
+						
+					if(map[x][y].b=="r")
+						context.drawImage(rail, map[x][y].x, map[x][y].y);	
+					//else
+					///	context.drawImage(dirtB, x*tileSize, y*tileSize);
+				}
+			}
+			
+			trainX = Math.floor(boundingWidth/2)-40-32;
+			trainY = boundingHeight-400;
+			
+			context.drawImage(trainBody, trainX, trainY);	
+			context.drawImage(trainTurret, trainX+3, trainY-10);
+			
+			context.drawImage(trainPlain, trainX, trainY+(60*1));
+			context.drawImage(trainPlain, trainX, trainY+(60*2));			
 		
 			for (var i = 0; i < ship.length; i++)
 			{
@@ -1247,11 +1389,16 @@
 		if(gameStarted)
 		{
 		
-			wrapText(context, sCurr, (boundingWidth/2)-30, boundingHeight-50, maxWidth, lineHeight);
+			//wrapText(context, sCurr, (boundingWidth/2)-30, boundingHeight-50, maxWidth, lineHeight);
 			context.fillStyle = 'white';
 			
 			//wrapText(context, "TIMER: " +globalTimer, (boundingWidth/2)-30, 25, maxWidth, lineHeight);
-			wrapText(context, "ENEMIES LEFT: " +enemiesLeft, (boundingWidth/2)-80, 25, maxWidth, lineHeight);
+			//wrapText(context, "ENEMIES LEFT: " +enemiesLeft, (boundingWidth/2)-80, 25, maxWidth, lineHeight);
+			
+			distanceTravelled = distanceTravelled + 0.2;
+			
+			wrapText(context, "DISTANCE TRAVELLED: " +Math.floor(distanceTravelled) +"m", (boundingWidth/2)-150, 25, maxWidth, lineHeight);
+			
 			
 			//maxWidth = 300;
 			//wrapText(context, touchText, 25, 50, maxWidth, lineHeight);
@@ -1344,6 +1491,19 @@
 			context.drawImage(image, -width / 2, -height / 2, width, height);
 			context.rotate(-angleInRadians);
 			context.translate(-x, -y);
+		}
+	}
+	
+	function handleTrainMovement()
+	{
+		for (x = 0; x < mapWidth; x++)
+		{
+			for (y = 0; y < mapHeight; y++)
+			{
+				map[x][y].y = map[x][y].y - player.dy;
+				if(map[x][y].y > boundingHeight+64)
+					map[x][y].y = -31;//0
+			}
 		}
 	}
 	
@@ -1627,7 +1787,10 @@
 		//drawCamera();
 		
 		if(gameStarted)
+		{
 			handleShipMovement();
+			handleTrainMovement();
+		}
 		
 		if(screenShakeDuration>0)
 		{
