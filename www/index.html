@@ -301,7 +301,7 @@
 	
 </head>
 
-<body onload="startingSetup();">
+<body onload="startingSetup();" onkeyup="return playerKeyUp(event);">
    
    <!--
    <div class="app">
@@ -554,6 +554,15 @@
 	trainPlain = new Image();
 	trainPlain.src = "images/trainPlain.png";
 	
+	tkTrainFront = new Image();
+	tkTrainFront.src = "images/tkTrainFront.png";
+	
+	tkTrainWood = new Image();
+	tkTrainWood.src = "images/tkTrainWood.png";
+	
+	tkTrainGoods = new Image();
+	tkTrainGoods.src = "images/tkTrainGoods.png";
+	
 	playerHealth = 5;
 	playerLevel = 1;
 	
@@ -709,6 +718,48 @@
 		explosion.ctx = context;
 		explosions.push(explosion);
 		
+	}
+	
+	function layTrack()
+	{
+		//RAAAAAAAAAAAAAAFE
+		lastRailY = lastRailY - 1;
+		//alert(mapHeight);
+		if(lastRailY<0)
+			lastRailY = mapHeight-1;//mapHeight-1;
+			
+		map[lastRailX][lastRailY].b = "r";
+		
+	}
+	
+	function playerKeyUp(e)
+	{
+		var keynum;
+
+		if (window.event) // IE                    
+		{
+			keynum = e.keyCode;
+		}
+		else if (e.which) // Netscape/Firefox/Opera
+		{
+			keynum = e.which;
+		}
+
+		var keyPressed = "?";
+		for(var name in ROT){
+			if(ROT[name] == keynum && name.indexOf("VK_") == 0) {keyPressed=name;}
+		}
+
+		if(keyPressed=="VK_LEFT")
+		{
+			//do nothing
+		}
+				
+		else if(keyPressed=="VK_Q")
+		{
+			layTrack();
+		}
+				
 	}
 	
 	function targetShip(x,y)
@@ -918,10 +969,11 @@
 		
 		context = document.getElementById('primaryCanvas').getContext('2d');
 		
+		lastRailX = 7;
+		lastRailY = -10;
 		
-		
-		mapWidth = (boundingWidth/tileSize); //33 //20
-		mapHeight = (boundingHeight/tileSize)+3;
+		mapWidth = Math.floor(boundingWidth/tileSize); //33 //20
+		mapHeight = Math.floor(boundingHeight/tileSize)+3;
 		
 		map = [];
 		for (x = 0; x < mapWidth; x++)
@@ -932,7 +984,7 @@
 				map[x][y] = new tile(".", "d", "500", true);
 				map[x][y].x = x*tileSize;
 				map[x][y].y = y*tileSize;
-				var r = Math.floor(Math.random()*3); //4
+				var r = Math.floor(Math.random()*2); //4
 				if(r==0)
 					map[x][y].f = "a"
 				else if(r==1)
@@ -1021,7 +1073,7 @@
 			ship[0] = new entity(0,0,"spy");
 			ship[1] = new entity(0,0,"spy");
 			ship[2] = new entity(0,0,"spy");
-			ship[3] = new entity(0,0,"grunt");
+			//ship[3] = new entity(0,0,"grunt");
 		}
 		
 		else if(playerLevel==2)
@@ -1330,27 +1382,47 @@
 					if(map[x][y].f=="a")
 						context.drawImage(dirt, map[x][y].x, map[x][y].y)
 					else if(map[x][y].f=="b")
-						context.drawImage(dirtB, map[x][y].x, map[x][y].y)
+						context.drawImage(stone, map[x][y].x, map[x][y].y)
 					else if(map[x][y].f=="c")
 						context.drawImage(dirtC, map[x][y].x, map[x][y].y)
 					else if(map[x][y].f=="d")
 						context.drawImage(stone, map[x][y].x, map[x][y].y);	
-						
+					
+					if(x==1)
+					{
+						context.fillStyle = 'white';
+						var maxWidth = 500;//400
+						var lineHeight = 25;
+						wrapText(context, ""+y, map[x][y].x, map[x][y].y, maxWidth, lineHeight);
+					}
+				
+					
 					if(map[x][y].b=="r")
+					{
 						context.drawImage(rail, map[x][y].x, map[x][y].y);	
+						
+						
+					}
 					//else
 					///	context.drawImage(dirtB, x*tileSize, y*tileSize);
 				}
 			}
 			
-			trainX = Math.floor(boundingWidth/2)-40-32;
+			trainX = lastRailX*tileSize;
+			
+			//trainX = Math.floor(boundingWidth/2)-40-32;
 			trainY = boundingHeight-400;
 			
-			context.drawImage(trainBody, trainX, trainY);	
-			context.drawImage(trainTurret, trainX+3, trainY-10);
+			//context.drawImage(trainBody, trainX, trainY);	
+			//context.drawImage(trainTurret, trainX+3, trainY-10);
+						
+			context.drawImage(tkTrainFront, trainX, trainY);
+			context.drawImage(tkTrainWood, trainX, trainY+75);
+			context.drawImage(tkTrainWood, trainX, trainY+75+72);
 			
-			context.drawImage(trainPlain, trainX, trainY+(60*1));
-			context.drawImage(trainPlain, trainX, trainY+(60*2));			
+			//context.drawImage(trainTurret, trainX, trainY+75-10);
+			drawR(trainTurret,trainX+30,trainY+110,45,"primaryCanvas")
+			context.drawImage(tkTrainGoods, trainX, trainY+75+72+72);
 		
 			for (var i = 0; i < ship.length; i++)
 			{
@@ -1501,8 +1573,23 @@
 			for (y = 0; y < mapHeight; y++)
 			{
 				map[x][y].y = map[x][y].y - player.dy;
-				if(map[x][y].y > boundingHeight+64)
-					map[x][y].y = -31;//0
+				if(map[x][y].y > boundingHeight+32) //64
+				{
+					map[x][y].y = -31;//0 //-31
+					
+					
+					map[x][y].b = ".";
+					var r = Math.floor(Math.random()*3); //4
+					if(r==0)
+						map[x][y].f = "a"
+					else if(r==1)
+						map[x][y].f = "b"
+					else if(r==2)
+						map[x][y].f = "c"
+					else if(r==3)
+						map[x][y].f = "d";
+				
+				}
 			}
 		}
 	}
