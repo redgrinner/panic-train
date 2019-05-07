@@ -515,6 +515,35 @@
 			this.weapon = "none";
 		}
 		
+		else if(this.type=="trainFront") 
+		{
+			this.team = "player";
+			this.image.src = "images/expTrainFront2.png";
+			this.health = 5;
+			this.radius = 32;
+		}
+		else if(this.type=="trainWood") 
+		{
+			this.team = "player";
+			this.image.src = "images/expTrainWood.png";
+			this.health = 5;
+			this.radius = 32;
+		}
+		else if(this.type=="trainGoods") 
+		{
+			this.team = "player";
+			this.image.src = "images/expTrainGoods.png";
+			this.health = 5;
+			this.radius = 32;
+		}
+		else if(this.type=="trainBack") 
+		{
+			this.team = "player";
+			this.image.src = "images/expTrainBack2.png";
+			this.health = 5;
+			this.radius = 32;
+		}
+		
 		this.maxHealth = this.health;
 		this.maxEnergy = this.energy;
 	
@@ -545,6 +574,9 @@
 	}
 	tileSize = 32;
 	
+	panel = new Image();
+	panel.src = "images/panel.png";
+	
 	trainBody = new Image();
 	trainBody.src = "images/trainBody.png";
 	
@@ -562,6 +594,16 @@
 	
 	tkTrainGoods = new Image();
 	tkTrainGoods.src = "images/tkTrainGoods.png";
+	
+	
+	expTrainFront = new Image();
+	expTrainGoods = new Image();
+	expTrainWood = new Image();
+	expTrainBack = new Image();
+	expTrainFront.src = "images/expTrainFront2.png";
+	expTrainGoods.src = "images/expTrainGoods.png";
+	expTrainWood.src = "images/expTrainWood.png";
+	expTrainBack.src = "images/expTrainBack2.png";
 	
 	playerHealth = 5;
 	playerLevel = 1;
@@ -643,9 +685,13 @@
 	
 	distanceArray = [0.10,0.25,0.5,0.75,1,1.25];
 	
-	
-	
-	
+	keyArray = 	[
+					['Q','VK_Q'],
+					['P','VK_P'],
+					['E','VK_E'],
+					['R','VK_R']
+				];
+		
 	function getDist(x, y, x2, y2)
 	{
 		x = x2 - x;
@@ -720,9 +766,12 @@
 		
 	}
 	
-	function layTrack()
+	function layTrack(p)
 	{
 		//RAAAAAAAAAAAAAAFE
+		//do your shield wolf magic here
+		//add in variable tracks, etc.
+				
 		lastRailY = lastRailY - 1;
 		//alert(mapHeight);
 		if(lastRailY<0)
@@ -730,6 +779,41 @@
 			
 		map[lastRailX][lastRailY].b = "r";
 		
+		keyArray = 	[
+					['A','VK_A'],
+					['B','VK_B'],
+					['C','VK_C'],
+					['D','VK_D'],
+					['E','VK_E'],
+					['F','VK_F'],
+					['G','VK_G'],
+					['H','VK_H'],
+					['I','VK_I'],
+					['J','VK_J'],
+					['K','VK_K'],
+					['L','VK_L'],
+					['M','VK_M'],
+					['N','VK_N'],
+					['O','VK_O'],
+					['P','VK_P'],
+					['Q','VK_Q'],
+					['R','VK_R'],
+					['S','VK_S'],
+					['T','VK_T'],
+					['U','VK_U'],
+					['V','VK_V'],
+					['W','VK_W'],
+					['Y','VK_Y'],
+					['X','VK_X'],
+					['Z','VK_Z']
+					];
+		
+		for(var i = 0; i < 24; i++)
+		{
+			var randomKey = Math.floor(Math.random() * keyArray.length);
+			keyArray.splice(randomKey,1);
+		}
+				
 	}
 	
 	function playerKeyUp(e)
@@ -755,10 +839,15 @@
 			//do nothing
 		}
 				
-		else if(keyPressed=="VK_Q")
-		{
-			layTrack();
-		}
+		else if(keyPressed==keyArray[0][1])
+			layTrack(0)
+		else if(keyPressed==keyArray[1][1])
+			layTrack(1);
+		
+		//else if(keyPressed=="VK_Q")
+		//{
+		//	layTrack(1);
+		//}
 				
 	}
 	
@@ -984,7 +1073,7 @@
 				map[x][y] = new tile(".", "d", "500", true);
 				map[x][y].x = x*tileSize;
 				map[x][y].y = y*tileSize;
-				var r = Math.floor(Math.random()*2); //4
+				var r = Math.floor(Math.random()*3); //4
 				if(r==0)
 					map[x][y].f = "a"
 				else if(r==1)
@@ -1032,10 +1121,10 @@
 		fogX_right = 1920;
 		backX = 3000;
 		
-		
+		comp = [];
 		player = new entity(528,488,"player");
 		player.dx = 0;
-		player.dy = -1;
+		player.dy = -0.5; //-1
 		
 		star = [];
 		for (var i = 0; i < 270; i++) //500 //270
@@ -1065,6 +1154,12 @@
 		ship = [];
 		
 		globalTimer = 60;
+		
+		comp = [];
+		comp[0] = new entity(224+16,(boundingHeight-(32*6))+(32*0),"trainFront");
+		comp[1] = new entity(224+16,(boundingHeight-(32*6))+(32*1),"trainWood");
+		comp[2] = new entity(224+16,(boundingHeight-(32*6))+(32*2),"trainGoods");
+		comp[3] = new entity(224+16,(boundingHeight-(32*6))+(32*3),"trainBack");
 		
 		if(playerLevel<=1)
 		{
@@ -1382,7 +1477,7 @@
 					if(map[x][y].f=="a")
 						context.drawImage(dirt, map[x][y].x, map[x][y].y)
 					else if(map[x][y].f=="b")
-						context.drawImage(stone, map[x][y].x, map[x][y].y)
+						context.drawImage(dirtB, map[x][y].x, map[x][y].y) //stone
 					else if(map[x][y].f=="c")
 						context.drawImage(dirtC, map[x][y].x, map[x][y].y)
 					else if(map[x][y].f=="d")
@@ -1409,24 +1504,32 @@
 			}
 			
 			trainX = lastRailX*tileSize;
-			
-			//trainX = Math.floor(boundingWidth/2)-40-32;
 			trainY = boundingHeight-400;
 			
-			//context.drawImage(trainBody, trainX, trainY);	
-			//context.drawImage(trainTurret, trainX+3, trainY-10);
-						
+			/*			
 			context.drawImage(tkTrainFront, trainX, trainY);
 			context.drawImage(tkTrainWood, trainX, trainY+75);
 			context.drawImage(tkTrainWood, trainX, trainY+75+72);
 			
-			//context.drawImage(trainTurret, trainX, trainY+75-10);
 			drawR(trainTurret,trainX+30,trainY+110,45,"primaryCanvas")
 			context.drawImage(tkTrainGoods, trainX, trainY+75+72+72);
-		
+						
+			context.drawImage(expTrainFront, trainX+100, trainY);
+			context.drawImage(expTrainWood, trainX+100, trainY+32);
+			context.drawImage(expTrainWood, trainX+100, trainY+32+32);
+			context.drawImage(expTrainGoods, trainX+100, trainY+32+32+32);
+			context.drawImage(expTrainBack, trainX+100, trainY+32+32+32+32);
+			drawR(trainTurret,trainX+120,trainY+75,45,"primaryCanvas")
+			*/
+			
 			for (var i = 0; i < ship.length; i++)
 			{
 				drawR(ship[i].image,ship[i].x,ship[i].y,ship[i].rot+90,"primaryCanvas")
+			}
+			
+			for (var i = 0; i < comp.length; i++)
+			{
+				drawR(comp[i].image,comp[i].x,comp[i].y,comp[i].rot+90,"primaryCanvas")
 			}
 		
 		}
@@ -1476,6 +1579,20 @@
 			//wrapText(context, touchText, 25, 50, maxWidth, lineHeight);
 		
 			//playerHealth = 10;
+		
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, boundingX+30, boundingHeight-80);
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(rail, boundingX+30+8, boundingHeight-80+8);
+			
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, boundingWidth-100, boundingHeight-80);
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(rail, boundingWidth-100+8, boundingHeight-80+8);
+			
+			
+			context.font = '24pt Calibri';
+			adjustX = 13;
+			adjustY = 33;
+			wrapText(context, keyArray[0][0], boundingX+30+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
+			wrapText(context, keyArray[1][0], boundingWidth-100+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
+			
 		
 			startingX = (playerHealth*16)-16;
 			for (var i = 0; i < playerHealth; i++)
