@@ -966,14 +966,7 @@
 		if(gameStarted)
 		{
 		
-			////
-			//maybe we are trying to hit a panel and not a ship, whooops
-			for (var i = 0; i < panelX.length; i++)
-			{
-				if(getDist(panelX[i]+25,panelY[i]+25,x,y)<40)
-					layTrack(i);
-			}
-			/////
+			
 		
 			var lethalHit = true;		
 			var targetHit = false;
@@ -1083,6 +1076,16 @@
 				var x = touch.pageX;
 				var y = touch.pageY;
 				targetShip(x,y);
+				
+				////
+				//maybe we are trying to hit a panel and not a ship, whooops
+				for (var i = 0; i < panelX.length; i++)
+				{
+					if(getDist(panelX[i]+25,panelY[i]+25,x,y)<40)
+						layTrack(i);
+				}
+				/////
+				
 			}
 		}
 		
@@ -1184,7 +1187,7 @@
 		
 		context = document.getElementById('primaryCanvas').getContext('2d');
 		
-		lastRailX = 7;
+		lastRailX = 4;
 		lastRailY = -10;
 		lastRailType = "up";
 		railRep = [];
@@ -1233,7 +1236,7 @@
 			}
 		}
 		
-		x = 7;
+		x = lastRailX;
 		for (y = 0; y < mapHeight; y++)
 		{
 			map[x][y].b = "up";
@@ -1306,10 +1309,10 @@
 		globalTimer = 60;
 		
 		comp = [];
-		comp[0] = new entity(224+16,(boundingHeight-(32*6))+(32*0),"trainFront");
-		comp[1] = new entity(224+16,(boundingHeight-(32*6))+(32*1),"trainWood");
-		comp[2] = new entity(224+16,(boundingHeight-(32*6))+(32*2),"trainGoods");
-		comp[3] = new entity(224+16,(boundingHeight-(32*6))+(32*3),"trainBack");
+		comp[0] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*0),"trainFront");
+		comp[1] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*1),"trainWood");
+		comp[2] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*2),"trainGoods");
+		comp[3] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*3),"trainBack");
 		
 		if(playerLevel<=1)
 		{
@@ -1328,10 +1331,9 @@
 		{
 			globalTimer = 20;
 			enemiesLeft = 20; //20;
-			ship[0] = new entity(0,0,"spy");
-			ship[1] = new entity(0,0,"spy");
-			ship[2] = new entity(0,0,"grunt");
-			ship[3] = new entity(0,0,"grunt");
+			ship[0] = new entity(0,0,"fan");
+			ship[1] = new entity(0,0,"fan");
+			ship[2] = new entity(0,0,"fan");
 		}
 		
 		else if(playerLevel==3)
@@ -1350,22 +1352,18 @@
 			globalTimer = 40;
 			enemiesLeft = 40;
 			waveMode = false;
-			ship[0] = new entity(0,0,"boss");
-			ship[1] = new entity(0,0,"boss");
-			ship[2] = new entity(0,0,"grunt");
-			ship[3] = new entity(0,0,"grunt");
-			ship[4] = new entity(0,0,"grunt");
+			ship[0] = new entity(0,0,"fan");
+			ship[1] = new entity(0,0,"fan");
+			ship[2] = new entity(0,0,"fan");
 		}
 		
 		else if(playerLevel==5)
 		{
 			globalTimer = 50;
 			enemiesLeft = 50;
-			ship[0] = new entity(0,0,"runner");
-			ship[1] = new entity(0,0,"runner");
-			ship[2] = new entity(0,0,"grunt");
-			ship[3] = new entity(0,0,"grunt");
-			ship[4] = new entity(0,0,"grunt");
+			ship[0] = new entity(0,0,"fan");
+			ship[1] = new entity(0,0,"fan");
+			ship[2] = new entity(0,0,"fan");
 		}
 		
 		else
@@ -1373,12 +1371,9 @@
 			globalTimer = 60;
 			enemiesLeft = 60;
 			//waveMode = true;
-			ship[0] = new entity(0,0,"runner");
-			ship[1] = new entity(0,0,"grunt");
-			ship[2] = new entity(0,0,"grunt");
-			ship[3] = new entity(0,0,"boss");
-			ship[4] = new entity(0,0,"grunt");
-			ship[5] = new entity(0,0,"grunt");
+			ship[0] = new entity(0,0,"fan");
+			ship[1] = new entity(0,0,"fan");
+			ship[2] = new entity(0,0,"fan");
 		}
 		
 		//ship = [];
@@ -1636,6 +1631,8 @@
 					else if(map[x][y].f=="d")
 						context.drawImage(stone, map[x][y].x, map[x][y].y);	
 					
+					/*
+					//scrolling text check
 					if(x==1)
 					{
 						context.fillStyle = 'white';
@@ -1643,6 +1640,7 @@
 						var lineHeight = 25;
 						wrapText(context, ""+y, map[x][y].x, map[x][y].y, maxWidth, lineHeight);
 					}
+					*/
 				
 					//need to add up/down 
 					//left right here 
@@ -1778,8 +1776,12 @@
 			//newY = mapHeight-1;
 			//if(newY < 0)
 			//	newY = newY + map.length
-			context.drawImage(greenSquare, testEntityX, testEntityY);
-			wrapText(context, ""+newY, testEntityX, testEntityY+30, maxWidth, lineHeight);
+			
+			//stupid greensquare and failed attempt to do things here
+			//context.drawImage(greenSquare, testEntityX, testEntityY);
+			//wrapText(context, ""+newY, testEntityX, testEntityY+30, maxWidth, lineHeight);
+			
+			
 			
 			/*
 			normally we take the y value and divide it by tilesize 
