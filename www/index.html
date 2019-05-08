@@ -514,7 +514,13 @@
 			//alert(this.image.src);
 			this.weapon = "none";
 		}
-		
+		else if(this.type=="fan") 
+		{
+			var r = Math.floor(Math.random() * 9)+1;
+			this.health = 1;
+			this.maxSpeed = 1; //2
+			this.image.src = "images/fan"+r+".png";
+		}
 		else if(this.type=="trainFront") 
 		{
 			this.team = "player";
@@ -577,24 +583,9 @@
 	panel = new Image();
 	panel.src = "images/panel.png";
 	
-	trainBody = new Image();
-	trainBody.src = "images/trainBody.png";
 	
 	trainTurret = new Image();
 	trainTurret.src = "images/trainTurret.png";
-	
-	trainPlain = new Image();
-	trainPlain.src = "images/trainPlain.png";
-	
-	tkTrainFront = new Image();
-	tkTrainFront.src = "images/tkTrainFront.png";
-	
-	tkTrainWood = new Image();
-	tkTrainWood.src = "images/tkTrainWood.png";
-	
-	tkTrainGoods = new Image();
-	tkTrainGoods.src = "images/tkTrainGoods.png";
-	
 	
 	expTrainFront = new Image();
 	expTrainGoods = new Image();
@@ -604,6 +595,9 @@
 	expTrainGoods.src = "images/expTrainGoods.png";
 	expTrainWood.src = "images/expTrainWood.png";
 	expTrainBack.src = "images/expTrainBack2.png";
+	
+	greenSquare = new Image();
+	greenSquare.src = "images/green.png";
 	
 	playerHealth = 5;
 	playerLevel = 1;
@@ -640,6 +634,16 @@
 	
 	rail = new Image();
 	rail.src = "images/rail.png";
+	railH = new Image();
+	railH.src = "images/rail_h.png";
+	railBottomLeft = new Image;
+	railBottomRight = new Image;
+	railBottomLeft.src = "images/rail_bottomleft.png";
+	railBottomRight.src = "images/rail_bottomright.png";
+	railTopLeft = new Image;
+	railTopRight = new Image;
+	railTopLeft.src = "images/rail_topleft.png";
+	railTopRight.src = "images/rail_topright.png";
 	
 	ship = [];
 	
@@ -766,19 +770,38 @@
 		
 	}
 	
+	function GetYDiff()
+	{
+		//alert(map[0][1].y);
+		
+		//var currY = map[0][0].y;
+		
+		
+		
+	}
+	
 	function layTrack(p)
 	{
+		
+		GetYDiff();
 		//RAAAAAAAAAAAAAAFE
 		//do your shield wolf magic here
-		//add in variable tracks, etc.
+		//fix shit up
+		//add in variable tracks, direction changes etc.
+				
+		//we should probably add in tracks that are combined with dangers here
+		//otherwise there would only be left, straight, right? (for tracks that work)
 				
 		lastRailY = lastRailY - 1;
 		//alert(mapHeight);
 		if(lastRailY<0)
-			lastRailY = mapHeight-1;//mapHeight-1;
+			lastRailY = mapHeight-1;
 			
-		map[lastRailX][lastRailY].b = "r";
+		//map[lastRailX][lastRailY].b = "r";
+		map[lastRailX][lastRailY].b = railOption[p];
+		lastRailType = railOption[p];
 		
+		//assign a random key to be pressed
 		keyArray = 	[
 					['A','VK_A'],
 					['B','VK_B'],
@@ -813,7 +836,94 @@
 			var randomKey = Math.floor(Math.random() * keyArray.length);
 			keyArray.splice(randomKey,1);
 		}
-				
+		
+		//railRep[0] = railBottomRight;
+		//railRep[1] = railBottomLeft;
+		//railOption[0] = "left";
+		//railOption[1] = "left";
+		//select an appropriate matching rail tile
+		
+		railRep = [];
+		railOption = [];
+		for(var i = 0; i < 2; i++)
+		{
+			var r = Math.floor(Math.random()*3);
+			if(lastRailType=="up")
+			{
+				if(r==0)
+					railOption[i] = "up"
+				else if(r==1)
+					railOption[i] = "topleft"
+				else if(r==2)
+					railOption[i] = "topright"
+			}
+			else if(lastRailType=="down")
+			{
+				if(r==0)
+					railOption[i] = "down"
+				else if(r==1)
+					railOption[i] = "bottomleft"
+				else if(r==2)
+					railOption[i] = "bottomright"
+			}
+			else if(lastRailType=="left")
+			{
+				if(r==0)
+					railOption[i] = "left"
+				else if(r==1)
+					railOption[i] = "topleft"
+				else if(r==2)
+					railOption[i] = "bottomleft"
+			}
+			else if(lastRailType=="right")
+			{
+				if(r==0)
+					railOption[i] = "right"
+				else if(r==1)
+					railOption[i] = "topright"
+				else if(r==2)
+					railOption[i] = "bottomright"
+			}
+			else if(lastRailType=="topleft")
+			{
+				railOption[i] = "right"
+			}
+			else if(lastRailType=="topright")
+			{
+				railOption[i] = "left"
+			}
+			else if(lastRailType=="bottomleft")
+			{
+				railOption[i] = "right"
+			}
+			else if(lastRailType=="bottomright")
+			{
+				railOption[i] = "left"
+			}
+			else // still need the other 4 types
+			{
+				alert("heywhat");
+			}
+			
+			if((railOption[i]=="left") || (railOption[i]=="right"))
+				railRep[i] = railH
+			else if((railOption[i]=="up") || (railOption[i]=="down"))
+				railRep[i] = rail
+			else if(railOption[i]=="topleft")
+				railRep[i] = railTopLeft
+			else if(railOption[i]=="topright")
+				railRep[i] = railTopRight
+			else if(railOption[i]=="bottomleft")
+				railRep[i] = railBottomLeft
+			else if(railOption[i]=="bottomright")
+				railRep[i] = railBottomRight
+			else
+			{
+				alert("what");
+			}
+			
+		}
+		
 	}
 	
 	function playerKeyUp(e)
@@ -856,11 +966,20 @@
 		if(gameStarted)
 		{
 		
+			////
+			//maybe we are trying to hit a panel and not a ship, whooops
+			for (var i = 0; i < panelX.length; i++)
+			{
+				if(getDist(panelX[i]+25,panelY[i]+25,x,y)<40)
+					layTrack(i);
+			}
+			/////
+		
 			var lethalHit = true;		
 			var targetHit = false;
 			for (var i = 0; i < ship.length; i++)
 			{
-				if(getDist(ship[i].x+16,ship[i].y+16,x,y)<32)
+				if(getDist(ship[i].x+16,ship[i].y+16,x,y)<32) 
 				{
 					targetHit = true;
 					ship[i].health = ship[i].health - 1;
@@ -903,6 +1022,13 @@
 			ship[p].y = 50+Math.floor(Math.random() * (boundingHeight-140))+boundingY;
 		ship[p].targetX = Math.floor(Math.random() * boundingWidth)+boundingX;
 		ship[p].targetY = boundingHeight;
+		
+		if(ship[p].type=="fan")
+		{
+			var r = Math.floor(Math.random() * 9)+1;
+			ship[p].image.src = "images/fan"+r+".png";
+		}
+		
 	}
 	
 	var obj = document.getElementById('primaryCanvas');
@@ -1060,6 +1186,27 @@
 		
 		lastRailX = 7;
 		lastRailY = -10;
+		lastRailType = "up";
+		railRep = [];
+		railOption = [];
+		railOption[0] = "up";
+		railOption[1] = "up";
+		railRep[0] = rail;
+		railRep[1] = rail;
+		yTravelled = 0;
+		
+		panelX = [];
+		panelY = [];
+		panelX[0] = boundingX+30;
+		panelY[0] = boundingHeight-80-48;
+		panelX[1] = boundingWidth-100;
+		panelY[1] = boundingHeight-80-48;
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[0], panelY[0]);
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[0], panelX[0]+8, panelY[0]+9);
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[1], panelY[1]);
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[1],panelX[1]+8, panelY[1]+9);
+			
+		
 		
 		mapWidth = Math.floor(boundingWidth/tileSize); //33 //20
 		mapHeight = Math.floor(boundingHeight/tileSize)+3;
@@ -1089,7 +1236,7 @@
 		x = 7;
 		for (y = 0; y < mapHeight; y++)
 		{
-			map[x][y].b = "r";
+			map[x][y].b = "up";
 		}
 		
 		//nX = Math.floor(Math.random() * boundingWidth)+boundingX;;
@@ -1136,6 +1283,9 @@
 		
 		playerHealth = 1;
 		hello();
+		
+		//GetYDiff();
+		
 	}
 	
 	function hello()
@@ -1165,9 +1315,12 @@
 		{
 			globalTimer = 10;
 			enemiesLeft = 10; // 10;
-			ship[0] = new entity(0,0,"spy");
-			ship[1] = new entity(0,0,"spy");
-			ship[2] = new entity(0,0,"spy");
+			ship[0] = new entity(0,0,"fan");
+			ship[1] = new entity(0,0,"fan");
+			ship[2] = new entity(0,0,"fan");
+			//ship[0] = new entity(0,0,"spy");
+			//ship[1] = new entity(0,0,"spy");
+			//ship[2] = new entity(0,0,"spy");
 			//ship[3] = new entity(0,0,"grunt");
 		}
 		
@@ -1491,13 +1644,24 @@
 						wrapText(context, ""+y, map[x][y].x, map[x][y].y, maxWidth, lineHeight);
 					}
 				
-					
-					if(map[x][y].b=="r")
-					{
-						context.drawImage(rail, map[x][y].x, map[x][y].y);	
-						
-						
-					}
+					//need to add up/down 
+					//left right here 
+					//also think about directions of things, we have some issues 
+					//not sure how approaching rails from diff directions changes things 
+					if((map[x][y].b=="up") || (map[x][y].b=="down"))
+						context.drawImage(rail, map[x][y].x, map[x][y].y)
+					else if((map[x][y].b=="left") || (map[x][y].b=="right"))
+						context.drawImage(railH, map[x][y].x, map[x][y].y)
+					else if(map[x][y].b=="railH")
+						context.drawImage(railH, map[x][y].x, map[x][y].y)
+					else if(map[x][y].b=="topleft")
+						context.drawImage(railTopLeft, map[x][y].x, map[x][y].y)	
+					else if(map[x][y].b=="topright")
+						context.drawImage(railTopRight, map[x][y].x, map[x][y].y)
+					else if(map[x][y].b=="bottomleft")
+						context.drawImage(railBottomLeft, map[x][y].x, map[x][y].y)
+					else if(map[x][y].b=="bottomright")
+						context.drawImage(railBottomRight, map[x][y].x, map[x][y].y);
 					//else
 					///	context.drawImage(dirtB, x*tileSize, y*tileSize);
 				}
@@ -1507,31 +1671,25 @@
 			trainY = boundingHeight-400;
 			
 			/*			
-			context.drawImage(tkTrainFront, trainX, trainY);
-			context.drawImage(tkTrainWood, trainX, trainY+75);
-			context.drawImage(tkTrainWood, trainX, trainY+75+72);
-			
-			drawR(trainTurret,trainX+30,trainY+110,45,"primaryCanvas")
-			context.drawImage(tkTrainGoods, trainX, trainY+75+72+72);
-						
-			context.drawImage(expTrainFront, trainX+100, trainY);
-			context.drawImage(expTrainWood, trainX+100, trainY+32);
-			context.drawImage(expTrainWood, trainX+100, trainY+32+32);
-			context.drawImage(expTrainGoods, trainX+100, trainY+32+32+32);
-			context.drawImage(expTrainBack, trainX+100, trainY+32+32+32+32);
 			drawR(trainTurret,trainX+120,trainY+75,45,"primaryCanvas")
 			*/
 			
 			for (var i = 0; i < ship.length; i++)
 			{
-				drawR(ship[i].image,ship[i].x,ship[i].y,ship[i].rot+90,"primaryCanvas")
+				if(ship[i].type == "fan")
+					drawR(ship[i].image,ship[i].x,ship[i].y,0,"primaryCanvas")
+				else
+					drawR(ship[i].image,ship[i].x,ship[i].y,ship[i].rot+90,"primaryCanvas");
 			}
 			
 			for (var i = 0; i < comp.length; i++)
 			{
 				drawR(comp[i].image,comp[i].x,comp[i].y,comp[i].rot+90,"primaryCanvas")
 			}
-		
+			
+			//context.drawImage(greenSquare, comp[0].x, comp[0].y);
+			
+			
 		}
 		//draw explosions
 		for (var i = exp.length-1; i >= 0; i--)
@@ -1580,18 +1738,79 @@
 		
 			//playerHealth = 10;
 		
-			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, boundingX+30, boundingHeight-80);
-			document.getElementById("primaryCanvas").getContext('2d').drawImage(rail, boundingX+30+8, boundingHeight-80+8);
+			//left and right panels and rail icons
+			//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, boundingX+30, boundingHeight-80-48);
+			//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[0], boundingX+30+8, boundingHeight-80-48+9);
+			//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, boundingWidth-100, boundingHeight-80-48);
+			//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[1], boundingWidth-100+8, boundingHeight-80-48+9);
 			
-			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, boundingWidth-100, boundingHeight-80);
-			document.getElementById("primaryCanvas").getContext('2d').drawImage(rail, boundingWidth-100+8, boundingHeight-80+8);
+			//panelX[0] = boundingX+30;
+			//panelY[0] = boundingHeight-80-48;
+			//panelX[1] = boundingWidth-100;
+			//panelY[1] = boundingHeight-80-48;
+			
+			//left and right panels and rail icons
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[0], panelY[0]);
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[0], panelX[0]+8, panelY[0]+9);
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[1], panelY[1]);
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[1],panelX[1]+8, panelY[1]+9);
+					
+			//left and right panels for keys 
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[0], boundingHeight-80);
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[1], boundingHeight-80);
+			
+			
 			
 			
 			context.font = '24pt Calibri';
+			context.fillStyle = 'white';
 			adjustX = 13;
 			adjustY = 33;
 			wrapText(context, keyArray[0][0], boundingX+30+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
 			wrapText(context, keyArray[1][0], boundingWidth-100+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
+			
+			
+			testEntityX = 64;
+			testEntityY = 32*5;
+			newY = Math.floor((testEntityY-yTravelled)/tileSize);
+			if(newY < 0)
+				newY = (-mapHeight-1-newY)*-1;
+			//newY = mapHeight-1;
+			//if(newY < 0)
+			//	newY = newY + map.length
+			context.drawImage(greenSquare, testEntityX, testEntityY);
+			wrapText(context, ""+newY, testEntityX, testEntityY+30, maxWidth, lineHeight);
+			
+			/*
+			normally we take the y value and divide it by tilesize 
+			that gives us the TILE Y 32/32 is tile 1
+			but we are travelling now : we can track this distance with 
+			yTravelled 
+			
+			to get the map coord we do the same 
+			randomYcoord / tileSize = tileY .. but that doesn't account for distance travelled 
+			
+			maybe it should be randomcoord-distanceTravelled/tileSize?
+			*/
+			
+			var tileY = 0;
+			
+			//map[0][tileY].y
+			
+			/*
+			wrapText(context, "yTravelled:" + yTravelled, 300, 50, maxWidth, lineHeight);
+			
+			wrapText(context, "startingY:" + (tileY*tileSize), 300, 100, maxWidth, lineHeight);
+			
+			wrapText(context, "currentY:" + map[0][tileY].y, 300, 125, maxWidth, lineHeight);
+			
+			wrapText(context, "tileY:" + (map[0][tileY].y/tileSize), 300, 150, maxWidth, lineHeight);
+			*/
+			
+			/*
+			we know where the tile SHOULD BE in xy coords
+			that is it's [][y] * tileSize 
+			*/
 			
 		
 			startingX = (playerHealth*16)-16;
@@ -1685,6 +1904,10 @@
 	
 	function handleTrainMovement()
 	{
+		yTravelled = yTravelled - player.dy;
+		if(yTravelled > boundingHeight+32)
+			yTravelled = -31;
+		
 		for (x = 0; x < mapWidth; x++)
 		{
 			for (y = 0; y < mapHeight; y++)
@@ -1858,17 +2081,16 @@
 			{
 				respawnShip(i);
 				
-				screenShakeDuration = 15;
-				playerHealth--;
-				if(playerHealth <= 0)
-				{
-					showDefeat();
-				}
-				else
-				{
-					//enemiesLeft--;
-					ship[i].health = 5000;
-				}
+				//screenShakeDuration = 15;
+				//playerHealth--;
+				//if(playerHealth <= 0)
+				//{
+				//	showDefeat();
+				//}
+				//else
+				//{
+				//	ship[i].health = 5000;
+				//}
 			}
 			
 			if(ship[i].x > boundingWidth)
