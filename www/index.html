@@ -580,6 +580,13 @@
 	}
 	tileSize = 32;
 	
+	bloodDecal = [];
+	for (var i = 0; i < 30; i++)
+	{
+		bloodDecal[i] = new Image();
+		bloodDecal[i].src = "images/blood/blood_red"+i+".png";
+	}
+	
 	panel = new Image();
 	panel.src = "images/panel.png";
 	
@@ -599,7 +606,7 @@
 	greenSquare = new Image();
 	greenSquare.src = "images/green.png";
 	
-	playerHealth = 5;
+	playerHealth = 3;
 	playerLevel = 1;
 	
 	gameStarted = false;
@@ -847,6 +854,8 @@
 		railOption = [];
 		for(var i = 0; i < 2; i++)
 		{
+			railOption[i] = "up"; //easy mode
+			/*
 			var r = Math.floor(Math.random()*3);
 			if(lastRailType=="up")
 			{
@@ -904,7 +913,7 @@
 			{
 				alert("heywhat");
 			}
-			
+			*/
 			if((railOption[i]=="left") || (railOption[i]=="right"))
 				railRep[i] = railH
 			else if((railOption[i]=="up") || (railOption[i]=="down"))
@@ -1009,6 +1018,7 @@
 	
 	function respawnShip(p)
 	{
+		
 		ship[p].x = 30+ Math.floor(Math.random() * (boundingWidth-80))+boundingX;
 		ship[p].y = 50;
 		if(ship[p].type=="spy")
@@ -1020,6 +1030,13 @@
 		{
 			var r = Math.floor(Math.random() * 9)+1;
 			ship[p].image.src = "images/fan"+r+".png";
+			var r = Math.floor(Math.random() * 3);
+			if(r==0)
+			{
+				ship[p].targetX = comp[0].x;
+				ship[p].targetY = comp[0].y;
+			}
+			
 		}
 		
 	}
@@ -1137,7 +1154,7 @@
 		document.getElementById('level_fail').innerHTML = "LEVEL: " + playerLevel;
 		playerScore = 0;
 		playerLevel = 1;
-		playerHealth = 5;
+		playerHealth = 3;
 		hello();
 		document.getElementById('loseScreen').style.display = "block";
 	}
@@ -1209,7 +1226,9 @@
 		//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[1], panelY[1]);
 		//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[1],panelX[1]+8, panelY[1]+9);
 			
-		
+		bloodX = []
+		bloodY = []
+		bloodID = [];
 		
 		mapWidth = Math.floor(boundingWidth/tileSize); //33 //20
 		mapHeight = Math.floor(boundingHeight/tileSize)+3;
@@ -1284,7 +1303,7 @@
 			star[star.length] = new heavenlyBody(rX,rY);
 		}
 		
-		playerHealth = 1;
+		playerHealth = 3;
 		hello();
 		
 		//GetYDiff();
@@ -1314,10 +1333,14 @@
 		comp[2] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*2),"trainGoods");
 		comp[3] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*3),"trainBack");
 		
+		bloodX = [];
+		bloodY = [];
+		bloodID = [];
+		
 		if(playerLevel<=1)
 		{
 			globalTimer = 10;
-			enemiesLeft = 10; // 10;
+			enemiesLeft = 20; // 10;
 			ship[0] = new entity(0,0,"fan");
 			ship[1] = new entity(0,0,"fan");
 			ship[2] = new entity(0,0,"fan");
@@ -1672,6 +1695,11 @@
 			drawR(trainTurret,trainX+120,trainY+75,45,"primaryCanvas")
 			*/
 			
+			for (var i = 0; i < bloodX.length; i++)
+			{
+				context.drawImage(bloodDecal[bloodID[i]], bloodX[i], bloodY[i]);
+			}
+			
 			for (var i = 0; i < ship.length; i++)
 			{
 				if(ship[i].type == "fan")
@@ -1909,6 +1937,17 @@
 		yTravelled = yTravelled - player.dy;
 		if(yTravelled > boundingHeight+32)
 			yTravelled = -31;
+		
+		for (var i = bloodY.length-1; i >= 0; i--)
+		{
+			bloodY[i] = bloodY[i] - player.dy;
+			if(bloodY[i] > boundingHeight+32)
+			{
+				bloodX.splice(i,1);
+				bloodY.splice(i,1);
+				bloodID.splice(i,1);
+			}
+		}
 		
 		for (x = 0; x < mapWidth; x++)
 		{
@@ -2161,6 +2200,19 @@
 			}
 			else 
 			{
+				
+				if(getDist(ship[i].x+16,ship[i].y+16,comp[0].x,comp[0].y)<32)
+				{
+					ship[i].health = -100;
+					
+					playerHealth--;
+					if(playerHealth <= 0)
+					{
+						showDefeat();
+					}
+					
+				}
+				
 				if(ship[i].health <= 0)
 				{
 					
@@ -2173,6 +2225,15 @@
 						ship[i].health = 10
 					else
 						ship[i].health = 1;
+					
+					//if the "ship" is a flesh and blood fan, pop them
+					//and leave a nice blood decal on the ground
+					if(ship[i].type=="fan")
+					{
+						bloodX[bloodX.length] = ship[i].x-16;
+						bloodY[bloodY.length] = ship[i].y-16;
+						bloodID[bloodID.length] = Math.floor(Math.random() * bloodDecal.length);
+					}
 					
 					respawnShip(i);
 					
