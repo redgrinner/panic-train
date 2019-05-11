@@ -1306,6 +1306,8 @@
 		playerHealth = 3;
 		hello();
 		
+		grindTimer = 0;
+		
 		//GetYDiff();
 		
 	}
@@ -1328,10 +1330,12 @@
 		globalTimer = 60;
 		
 		comp = [];
-		comp[0] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*0),"trainFront");
-		comp[1] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*1),"trainWood");
-		comp[2] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*2),"trainGoods");
-		comp[3] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*3),"trainBack");
+		comp[0] = new entity((lastRailX*tileSize)+16,32*8,"trainFront");
+		
+		//comp[0] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*0),"trainFront");
+		//comp[1] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*1),"trainWood");
+		//comp[2] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*2),"trainGoods");
+		//comp[3] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*3),"trainBack");
 		
 		bloodX = [];
 		bloodY = [];
@@ -1431,6 +1435,63 @@
 		}
 		*/
 		
+		
+	lastRailX = 4;
+		lastRailY = -10;
+		lastRailType = "up";
+		railRep = [];
+		railOption = [];
+		railOption[0] = "up";
+		railOption[1] = "up";
+		railRep[0] = rail;
+		railRep[1] = rail;
+		yTravelled = 0;
+		
+		panelX = [];
+		panelY = [];
+		panelX[0] = boundingX+30;
+		panelY[0] = boundingHeight-80-48;
+		panelX[1] = boundingWidth-100;
+		panelY[1] = boundingHeight-80-48;
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[0], panelY[0]);
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[0], panelX[0]+8, panelY[0]+9);
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[1], panelY[1]);
+		//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[1],panelX[1]+8, panelY[1]+9);
+			
+		bloodX = []
+		bloodY = []
+		bloodID = [];
+		
+		mapWidth = Math.floor(boundingWidth/tileSize); //33 //20
+		mapHeight = Math.floor(boundingHeight/tileSize)+3;
+		
+		map = [];
+		for (x = 0; x < mapWidth; x++)
+		{
+			map[x] = [];
+			for (y = 0; y < mapHeight; y++)
+			{
+				map[x][y] = new tile(".", "d", "500", true);
+				map[x][y].x = x*tileSize;
+				map[x][y].y = y*tileSize;
+				var r = Math.floor(Math.random()*3); //4
+				if(r==0)
+					map[x][y].f = "a"
+				else if(r==1)
+					map[x][y].f = "b"
+				else if(r==2)
+					map[x][y].f = "c"
+				else if(r==3)
+					map[x][y].f = "d";
+				
+			}
+		}
+		
+		x = lastRailX;
+		for (y = 0; y < mapHeight; y++)
+		{
+			map[x][y].b = "up";
+		}
 		
 		
 	}
@@ -1606,6 +1667,14 @@
 		context.restore();
 	}
 	
+	function getTileY(givenY)
+	{
+		var fmlY = tileSize + Math.floor(givenY - yTravelled);
+		if(fmlY < 0)
+			fmlY = fmlY + boundingHeight+64;
+		return(Math.floor(fmlY/tileSize));
+	}
+	
 	function drawCamera()
 	{
 		
@@ -1624,7 +1693,6 @@
 		
 		//document.getElementById("primaryCanvas").getContext('2d').drawImage(ninja, nX, nY);
 		
-			
 		
 		if(gameStarted)
 		{
@@ -1654,14 +1722,15 @@
 					else if(map[x][y].f=="d")
 						context.drawImage(stone, map[x][y].x, map[x][y].y);	
 					
-					/*
+					
 					//scrolling text check
+					/*
 					if(x==1)
 					{
 						context.fillStyle = 'white';
 						var maxWidth = 500;//400
 						var lineHeight = 25;
-						wrapText(context, ""+y, map[x][y].x, map[x][y].y, maxWidth, lineHeight);
+						wrapText(context, ""+y+","+map[x][y].y, map[x][y].x, map[x][y].y, maxWidth, lineHeight);
 					}
 					*/
 				
@@ -1794,53 +1863,58 @@
 			adjustY = 33;
 			wrapText(context, keyArray[0][0], boundingX+30+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
 			wrapText(context, keyArray[1][0], boundingWidth-100+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
-			
-			
-			testEntityX = 64;
-			testEntityY = 32*5;
-			newY = Math.floor((testEntityY-yTravelled)/tileSize);
-			if(newY < 0)
-				newY = (-mapHeight-1-newY)*-1;
-			//newY = mapHeight-1;
-			//if(newY < 0)
-			//	newY = newY + map.length
-			
-			//stupid greensquare and failed attempt to do things here
-			//context.drawImage(greenSquare, testEntityX, testEntityY);
-			//wrapText(context, ""+newY, testEntityX, testEntityY+30, maxWidth, lineHeight);
-			
-			
-			
+						
 			/*
-			normally we take the y value and divide it by tilesize 
-			that gives us the TILE Y 32/32 is tile 1
-			but we are travelling now : we can track this distance with 
-			yTravelled 
+			//reports on some of the tile/track positioning
+			x = 1;
+			for (y = 0; y < mapHeight; y++)
+			{
+				context.fillStyle = 'white';
+				var maxWidth = 500;//400
+				var lineHeight = 25;
+				wrapText(context, ""+y+";"+Math.floor(map[x][y].y), map[x][y].x, map[x][y].y, maxWidth, lineHeight);
+			}
+						
+			maxWidth = 1000;
+			wrapText(context, "The car is at "+comp[0].y + " pixels", 300, 300, maxWidth, lineHeight);
+			wrapText(context, "Objectively, the the tile would be: "+comp[0].y + "/ tileSize, so " +Math.floor(comp[0].y/tileSize), 300, 330, maxWidth, lineHeight);
+			wrapText(context, "car y - distanceShifterd = " +Math.floor(comp[0].y - yTravelled), 300, 365, maxWidth, lineHeight);
+			wrapText(context, "The tiles have been shifted "+ Math.floor(yTravelled) + " pixels from their original start", 300, 400, maxWidth, lineHeight);
+			wrapText(context, "tile 8 y: " +Math.floor(map[0][8].y) + " vs " +Math.floor(comp[0].y + yTravelled), 300, 425, maxWidth, lineHeight);
 			
-			to get the map coord we do the same 
-			randomYcoord / tileSize = tileY .. but that doesn't account for distance travelled 
+			//player.dy = -0.5; //0/01
 			
-			maybe it should be randomcoord-distanceTravelled/tileSize?
+			var crazyY = Math.floor(comp[0].y + yTravelled);
+			if(crazyY > boundingHeight+32)
+				crazyY = crazyY - (boundingHeight+64);
+			
+			wrapText(context, "tile 8 y: " +Math.floor(map[0][8].y) + " vs " +crazyY, 300, 455, maxWidth, lineHeight);
+			wrapText(context, "The train might be on tile: " + getTileY(comp[0].y), 300, 510, maxWidth, lineHeight);
+			wrapText(context, "Map " + Math.floor(comp[0].x/tileSize) + ";" + getTileY(comp[0].y) + " is " + map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b, 300, 540, maxWidth, lineHeight);
 			*/
 			
-			var tileY = 0;
-			
-			//map[0][tileY].y
-			
-			/*
-			wrapText(context, "yTravelled:" + yTravelled, 300, 50, maxWidth, lineHeight);
-			
-			wrapText(context, "startingY:" + (tileY*tileSize), 300, 100, maxWidth, lineHeight);
-			
-			wrapText(context, "currentY:" + map[0][tileY].y, 300, 125, maxWidth, lineHeight);
-			
-			wrapText(context, "tileY:" + (map[0][tileY].y/tileSize), 300, 150, maxWidth, lineHeight);
-			*/
-			
-			/*
-			we know where the tile SHOULD BE in xy coords
-			that is it's [][y] * tileSize 
-			*/
+			if(map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b==".")
+			{
+				//train not on a rail
+				//playerHealth--;
+				
+				grindTimer++;
+				if(grindTimer>3)
+				{
+					grindTimer = 0;
+					
+					explodeSomething(comp[0].x-16,comp[0].y+16,"spark");
+					explodeSomething(comp[0].x+16,comp[0].y+16,"spark");
+					playerHealth--;
+					if(playerHealth <= 0)
+					{
+						showDefeat();
+					}
+				}
+				
+				
+				
+			}
 			
 		
 			startingX = (playerHealth*16)-16;
@@ -1934,6 +2008,7 @@
 	
 	function handleTrainMovement()
 	{
+		
 		yTravelled = yTravelled - player.dy;
 		if(yTravelled > boundingHeight+32)
 			yTravelled = -31;
@@ -1973,6 +2048,9 @@
 				}
 			}
 		}
+		
+		
+		
 	}
 	
 	function handleShipMovement()
