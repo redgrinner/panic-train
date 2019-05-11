@@ -1330,12 +1330,12 @@
 		globalTimer = 60;
 		
 		comp = [];
-		comp[0] = new entity((lastRailX*tileSize)+16,32*8,"trainFront");
+		//comp[0] = new entity((lastRailX*tileSize)+16,32*8,"trainFront");
 		
-		//comp[0] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*0),"trainFront");
-		//comp[1] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*1),"trainWood");
-		//comp[2] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*2),"trainGoods");
-		//comp[3] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*6))+(32*3),"trainBack");
+		comp[0] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*0),"trainFront");
+		comp[1] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*1),"trainWood");
+		comp[2] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*2),"trainGoods");
+		comp[3] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*3),"trainBack");
 		
 		bloodX = [];
 		bloodY = [];
