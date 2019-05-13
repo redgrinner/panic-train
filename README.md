@@ -24,3 +24,61 @@ She blinked at him. “What does that mean?”
 “It means we are royally fucked, Madam Conductor.”
 
 Elisabeth groaned.
+
+#     #     #
+
+CHAPTER 1 - PANIC PLAIN
+*Is it a bird? Is it a plane? No it's just a plain. And no we won't be keeping this; I just saw the pun and historical imperative compelled me.
+
+[Design notes: very basic first mission, maybe with some trees or pits that need to be navigated around; otherwise just a flat plain with some time for narrative elements and a chance to introduce basic gameplay]
+
+Description pending
+
+CHAPTER 2 - A RIVER ROARING
+*In which our protagonists have to contend with the fearsome powers of unleashed hydronamics!
+
+[Design notes: the bridge over the river has been destroyed by the DAMN GUBMINT and the player has to build a bridge over the river or ford it over a shallow patch]
+
+Description pending
+
+CHAPTER 3 - A PERILOUS ASCENT
+*In which the Train must navigate the highs and lows of unforgiving Geography!
+
+[Design notes: a map with ups and downs, possibly either through a canyon system (shorter route has more ascents & descents, longer route is flatter]
+
+Description pending
+
+CHAPTER 4 - BURNING BRIGHT, IN THE FORESTS OF THE NIGHT
+*In which the Train must plunge into the not-so-stygian darkness of a forest aflame!
+
+[Design notes: the Train enters a burning forest at nighttime obviously, and the tracks can be damaged by fire/falling trees]
+
+Description pending
+
+CHAPTER 5 - 
+*In which the Train ...
+
+[Design notes: ]
+
+Description pending
+
+CHAPTER 6 - 
+*In which the Train ...
+
+[Design notes: ]
+
+Description pending
+
+CHAPTER 7 - 
+*In which the Train ...
+
+[Design notes: ]
+
+Description pending
+
+CHAPTER  - 
+*In which the Train ...
+
+[Design notes: ]
+
+Description pending
