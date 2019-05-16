@@ -531,6 +531,8 @@
 		this.health = 1;
 		this.energy = 10;
 		
+		this.direction = "up";
+		
 		this.targetX = 0;
 		this.targetY = 0;
 		
@@ -1072,10 +1074,10 @@
 		}
 		
 		//override so that you only ever get Q/W as the required keys
-		//keyArray = 	[
-		//			['Q','VK_Q'],
-		//			['W','VK_W']
-		//			];
+		keyArray = 	[
+					['Q','VK_Q'],
+					['W','VK_W']
+					];
 		
 		
 		//select an appropriate matching rail tile
@@ -1147,7 +1149,7 @@
 				alert("heywhat");
 			}
 			
-			railOption[i] = "up"; //easy mode
+			//railOption[i] = "up"; //easy mode
 			
 			if((railOption[i]=="left") || (railOption[i]=="right"))
 				railRep[i] = railH
@@ -1341,6 +1343,7 @@
 	//and then later set up /reset values in hello()
 	function startingSetup()
 	{
+		isMovingUp = false;
 		storyTextID = 0;
 		continueText();
 		
@@ -1573,6 +1576,12 @@
 		comp[2] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*2),"trainWood");
 		comp[3] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*3),"trainGoods");
 		comp[4] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*4),"trainBack");
+		
+		for (var i = 0; i < 4; i++)
+		{
+			comp[i].direction = "up";
+			comp[i].dy = -0.5;
+		}
 		
 		
 		bloodX = [];
@@ -1974,7 +1983,7 @@
 			wrapText(context, keyArray[0][0], boundingX+30+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
 			wrapText(context, keyArray[1][0], boundingWidth-100+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
 						
-			/*
+			
 			//reports on some of the tile/track positioning
 			x = 1;
 			for (y = 0; y < mapHeight; y++)
@@ -2001,7 +2010,7 @@
 			wrapText(context, "tile 8 y: " +Math.floor(map[0][8].y) + " vs " +crazyY, 300, 455, maxWidth, lineHeight);
 			wrapText(context, "The train might be on tile: " + getTileY(comp[0].y), 300, 510, maxWidth, lineHeight);
 			wrapText(context, "Map " + Math.floor(comp[0].x/tileSize) + ";" + getTileY(comp[0].y) + " is " + map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b, 300, 540, maxWidth, lineHeight);
-			*/
+			
 			
 			if(map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b==".")
 			{
@@ -2015,7 +2024,7 @@
 					
 					explodeSomething(comp[0].x-16,comp[0].y+16,"spark");
 					explodeSomething(comp[0].x+16,comp[0].y+16,"spark");
-					playerHealth--;
+					//playerHealth--;
 					if(playerHealth <= 0)
 					{
 						showDefeat();
@@ -2132,37 +2141,52 @@
 	
 	function handleTrainMovement()
 	{
-		
-		/*
+		isMovingUp = false;
+				
 		for (var i = comp.length-1; i >= 0; i--)
 		{
 			var tileX = Math.floor(comp[i].x/tileSize);
 			var tileY = getTileY(comp[i].y);
 					
-			if(map[tileX][tileY].b=="up")
-				player.dy = -0.5
+			if((map[tileX][tileY].b=="up") || (map[tileX][tileY].b=="bottomleft") || (map[tileX][tileY].b=="bottomright"))
+			{
+				comp[i].dy = -0.5;
+				//if((i != 0) && (comp[0].dy==0))
+				if(isMovingUp==false)
+					comp[i].y = comp[i].y + comp[i].dy;
+			}
 			else if((map[tileX][tileY].b=="topleft") || (map[tileX][tileY].b=="right"))
 			{
+				comp[i].dy = 0;
 				comp[i].dx = 0.5;
 				comp[i].x = comp[i].x + comp[i].dx;
 			}
 			else if((map[tileX][tileY].b=="topright") || (map[tileX][tileY].b=="left"))
 			{
+				comp[i].dy = 0;
 				comp[i].dx = -0.5;
 				comp[i].x = comp[i].x + comp[i].dx;
 			}
 			else
-				player.dy = -0.1;
+				alert("DERAILED");
+				//player.dy = -0.1;
+				
+			if(comp[0].dy!=0)
+				isMovingUp = true;
+			//if(comp[i].dy!=0)
+			//	isMovingUp = true;	
+			
 		}
-		*/
 		
-		yTravelled = yTravelled - player.dy;
+		if(isMovingUp)
+		yTravelled = yTravelled - comp[0].dy; //player.dy;
 		if(yTravelled > boundingHeight+32)
 			yTravelled = -31;
 		
 		for (var i = bloodY.length-1; i >= 0; i--)
 		{
-			bloodY[i] = bloodY[i] - player.dy;
+			if(isMovingUp)
+			bloodY[i] = bloodY[i] -comp[0].dy; //player.dy;
 			if(bloodY[i] > boundingHeight+32)
 			{
 				bloodX.splice(i,1);
@@ -2175,7 +2199,8 @@
 		{
 			for (y = 0; y < mapHeight; y++)
 			{
-				map[x][y].y = map[x][y].y - player.dy;
+				if(isMovingUp)
+				map[x][y].y = map[x][y].y - comp[0].dy;//player.dy;
 				if(map[x][y].y > boundingHeight+32) //64
 				{
 					map[x][y].y = -31;//0 //-31
