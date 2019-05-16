@@ -172,18 +172,7 @@
 			transform: translate(-50%, -30%);
 	
 		}
-		.adjustedCenter
-		{
-			box-sizing: border-box;
-			text-align:center;
-			-webkit-border-radius: 0.75em;
-			/*-moz-border-radius: 0.75em;*/
-			border-radius:0.75em;			
-			/*background-color:rgba(33, 33, 33, 0.6);*/
-			color:#ffffff;
-			padding:10px; /*25px*/
-		}
-		
+				
 		.menuScreen
 		{
 			position: absolute;
@@ -456,10 +445,12 @@
 	
 	<script>
 	
+	//-------------------------------------------
+	//NOTES / TODO LIST
+	//-------------------------------------------
+	
 	
 	//cursor/explosion positions seem off 
-	
-	//maybe cap explosions when the screen isn't drawing 
 	//rotate turret or whatever to touch taps 
 	//change track shit back to a simple version 
 	//limit track going off the screen 
@@ -469,10 +460,6 @@
 	//make sure shit resets correctly 
 	//new backgrounds/menu
 	//rotate turret to mouseXY 
-
-	
-	//nX = 0;
-	//nY = 0;
 	
 	/*
 	pressing keys to lay tracks
@@ -482,20 +469,24 @@
 	perhaps we should scale mapWidth/height down to specific tileSize increments and cap it for html 
 	*/
 	
+	//-------------------------------------------
+	//OBJECT/CLASS DECLARATIONS
+	//-------------------------------------------
+	
 	function tile(pForeground, pBackground, pHealth, pSolid)
 	{
 		this.f = pForeground;
 		this.b = pBackground;
-		this.detected = "na";
-		this.health = pHealth;
-		this.solid = pSolid;
-		this.light = 1;;
-		this.charCol = "white";
-		this.frame = 0;
-		this.bgFrame = 0;
-		this.special = 0;
-		this.x = 0;
-		this.y = 0;
+		//this.detected = "na";
+		//this.health = pHealth;
+		//this.solid = pSolid;
+		//this.light = 1;;
+		//this.charCol = "white";
+		//this.frame = 0;
+		//this.bgFrame = 0;
+		//this.special = 0;
+		this.x = 0; //this is the onscreen coords, not the array coords
+		this.y = 0; //this is the onscreen coords, not the array coords
 	}
 		
 	function heavenlyBody(pX,pY)
@@ -532,9 +523,9 @@
 		this.dy = 0;
 		this.ax = 0;
 		this.ay = 0;
-		this.speed = 0; //8
-		this.maxSpeed = 2; //5
-		this.xSpeed = 6; //8
+		this.speed = 0; 
+		this.maxSpeed = 2; 
+		this.xSpeed = 6; 
 		this.jumpPower = 8
 		this.hasGravity = true;
 		this.health = 1;
@@ -550,7 +541,6 @@
 		
 		this.image = new Image();
 		this.image.src = "images/ninja_0.png";
-		//this.image.src = "images/small/sab_complete.png";
 		this.frame = 1;
 		this.frameMax = 6;
 		
@@ -644,6 +634,12 @@
 		this.type = t;
 		this.canvas = "primaryCanvas";
 	}
+	
+	//-------------------------------------------
+	//GLOBALS VARIABLES AND ARRAY DECLARATIONS
+	//-------------------------------------------
+	//a lof of this shit (and other shit)
+	//can be found in startingSetup() and hello()
 	
 	mapWidth = 10; 
 	mapHeight = 10
@@ -778,12 +774,17 @@
 					['R','VK_R']
 				];
 	
+	//-------------------------------------------
+	//some general functions
+	//-------------------------------------------
+	
 	//might not be a perfect test, but beautifully lightweight.
 	function isMobileDevice() 
 	{
 		return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 	}
 	
+	//get distance between two sets of coords
 	function getDist(x, y, x2, y2)
 	{
 		x = x2 - x;
@@ -791,6 +792,7 @@
 		return Math.floor(Math.sqrt(x * x + y * y));
 	}
 	
+	//simplified function for writing text that wraps to the canvas
 	function wrapText(ctx, text, x, y, maxWidth, lineHeight) 
 	{
 		var words = text.split(' ');
@@ -815,6 +817,7 @@
         ctx.fillText(line, x, y);
     }
 	
+	//create an explosion (of a particular type) at xy coord
 	function explodeSomething(x,y,type)
 	{
 		if(type=="spark")
@@ -838,16 +841,169 @@
 		
 	}
 		
+	
+	//-------------------------------------------
+	//input handling: keyboard, mouse, touch
+	//-------------------------------------------
+	
+	//called when the player releases a key on keyboard
+	function playerKeyUp(e)
+	{
+		var keynum;
+
+		if (window.event) // IE                    
+		{
+			keynum = e.keyCode;
+		}
+		else if (e.which) // Netscape/Firefox/Opera
+		{
+			keynum = e.which;
+		}
+
+		var keyPressed = "?";
+		for(var name in ROT){
+			if(ROT[name] == keynum && name.indexOf("VK_") == 0) {keyPressed=name;}
+		}
+
+		if(keyPressed=="VK_LEFT")
+		{
+			//do nothing
+		}
+				
+		else if(keyPressed==keyArray[0][1])
+			layTrack(0)
+		else if(keyPressed==keyArray[1][1])
+			layTrack(1);
+		
+		//else if(keyPressed=="VK_Q")
+		//{
+		//	layTrack(1);
+		//}
+				
+	}
+		
+	//event listener for moving a finger on touchscreen
+	var obj = document.getElementById('primaryCanvas');
+	obj.addEventListener('touchmove', function(event) 
+	{
+		if(gameStarted)
+		{
+			var z = 0; //limit touches to the 1st finger 
+			//for (var z = 0; z < event.targetTouches.length; z++)
+			{
+				swipeLength++;
+				if(swipeLength < 20)
+				{
+					var touch = event.targetTouches[z];
+					var x = touch.pageX;
+					var y = touch.pageY;
+					targetShip(x,y);
+				}
+			}
+			
+			//superpower test
+			if((event.targetTouches.length==2) && (swipeLength > 15) && (swipeLength < 20))
+			{
+				swipeLength = 100;
+				for (var i = 0; i < ship.length; i++)
+				{
+					ship[i].health = 0;
+					explodeSomething(ship[i].x,ship[i].y,"boom");
+				}
+			}
+			
+		}
+		
+	}, false);
+	
+	//event listener for starting a touch	
+	obj.addEventListener('touchstart', function(event) 
+	{
+		
+		//if there is only one finger starting to touch, reset the swipe length 
+		//counter as we are starting a new swipe
+		if(event.targetTouches.length==1)
+			swipeLength = 0;
+		
+		touchText = "";
+		//touchText = "touches: " + event.targetTouches.length;
+		
+		if(gameStarted)
+		{
+			for (var z = 0; z < event.targetTouches.length; z++)
+			{
+				var touch = event.targetTouches[z];
+				var x = touch.pageX;
+				var y = touch.pageY;
+				targetShip(x,y);
+				
+				////
+				//maybe we are trying to hit a panel and not a ship, whooops
+				for (var i = 0; i < panelX.length; i++)
+				{
+					if(getDist(panelX[i]+25,panelY[i]+25,x,y)<40)
+						layTrack(i);
+				}
+				/////
+				
+			}
+		}
+		
+	}, false);
+	
+	//event listener for ending a touch
+	obj.addEventListener('touchend', function(event) 
+	{
+		/*
+		if(gameStarted)
+		{
+			
+			for (var z = 0; z < event.targetTouches.length; z++)
+			{
+								
+				var touch = event.targetTouches[z];
+				var x = touch.pageX;
+				var y = touch.pageY;
+				targetShip(x,y);
+			}
+		}
+		*/
+		
+	}, false);
+	
+	function canvasClick(event)
+	{
+		if(gameStarted)
+		{
+			var x = event.clientX;
+			var y = event.clientY;
+			targetShip(x,y);
+		}
+	}
+	
+	function playerMouseMove(event)
+	{
+		mouseX = event.clientX;
+		mouseY = event.clientY;
+		adjustedMouseX = mouseX+cameraX;
+		adjustedMouseY = mouseY+cameraY;
+	}
+	
+	//-------------------------------------------
+	//gameplay / general functions
+	//-------------------------------------------
+		
+	//called when the player presses a key to lay track
 	function layTrack(p)
 	{
 		
-		//RAAAAAAAAAAAAAAFE
-		//do your shield wolf magic here
+		//if(RAAAAAAAAAAAAAAFE)
+		//	do_your_shield_wolf_magic_here()
 		//fix shit up
-		//add in variable tracks, direction changes etc.
-				
+		//add in variable tracks, direction changes etc.		
 		//
-			
+		
+		//contents of this function are largely placeholder/garbage
 		
 		if((railOption[p]=="up") || (railOption[p]=="topleft") || (railOption[p]=="topright"))
 		{
@@ -915,17 +1071,14 @@
 			keyArray.splice(randomKey,1);
 		}
 		
-		keyArray = 	[
-					['Q','VK_Q'],
-					['W','VK_W']
-					];
+		//override so that you only ever get Q/W as the required keys
+		//keyArray = 	[
+		//			['Q','VK_Q'],
+		//			['W','VK_W']
+		//			];
 		
-		//railRep[0] = railBottomRight;
-		//railRep[1] = railBottomLeft;
-		//railOption[0] = "left";
-		//railOption[1] = "left";
+		
 		//select an appropriate matching rail tile
-		
 		railRep = [];
 		railOption = [];
 		for(var i = 0; i < 2; i++)
@@ -994,6 +1147,7 @@
 				alert("heywhat");
 			}
 			
+			railOption[i] = "up"; //easy mode
 			
 			if((railOption[i]=="left") || (railOption[i]=="right"))
 				railRep[i] = railH
@@ -1015,49 +1169,26 @@
 		}
 		
 	}
-	
-	function playerKeyUp(e)
-	{
-		var keynum;
-
-		if (window.event) // IE                    
-		{
-			keynum = e.keyCode;
-		}
-		else if (e.which) // Netscape/Firefox/Opera
-		{
-			keynum = e.which;
-		}
-
-		var keyPressed = "?";
-		for(var name in ROT){
-			if(ROT[name] == keynum && name.indexOf("VK_") == 0) {keyPressed=name;}
-		}
-
-		if(keyPressed=="VK_LEFT")
-		{
-			//do nothing
-		}
-				
-		else if(keyPressed==keyArray[0][1])
-			layTrack(0)
-		else if(keyPressed==keyArray[1][1])
-			layTrack(1);
 		
-		//else if(keyPressed=="VK_Q")
-		//{
-		//	layTrack(1);
-		//}
-				
+	//the map is scrolling so this function exists as a way to
+	//get the tileY coord (map[x][THISY]) at a given onscreen Y coord 
+	function getTileY(givenY)
+	{
+		var fmlY = tileSize + Math.floor(givenY - yTravelled);
+		if(fmlY < 0)
+			fmlY = fmlY + boundingHeight+64;
+		return(Math.floor(fmlY/tileSize));
 	}
 	
+	//called when you click the canvas or touch a touchscreen
+	//squish fans that are clicked on
 	function targetShip(x,y)
 	{
 		if(gameStarted)
 		{
 		
-			x = x +16;
-			y = y +16;
+			//x = x +16;
+			//y = y +16;
 		
 			var lethalHit = true;		
 			var targetHit = false;
@@ -1095,7 +1226,7 @@
 		  
 		}
 	}
-			
+		
 	function respawnShip(p)
 	{
 		
@@ -1119,102 +1250,6 @@
 			
 		}
 		
-	}
-	
-	var obj = document.getElementById('primaryCanvas');
-	obj.addEventListener('touchmove', function(event) 
-	{
-		if(gameStarted)
-		{
-			var z = 0; //limit touches to the 1st finger 
-			//for (var z = 0; z < event.targetTouches.length; z++)
-			{
-				swipeLength++;
-				if(swipeLength < 20)
-				{
-					var touch = event.targetTouches[z];
-					var x = touch.pageX;
-					var y = touch.pageY;
-					targetShip(x,y);
-				}
-			}
-			
-			//superpower test
-			if((event.targetTouches.length==2) && (swipeLength > 15) && (swipeLength < 20))
-			{
-				swipeLength = 100;
-				for (var i = 0; i < ship.length; i++)
-				{
-					ship[i].health = 0;
-					explodeSomething(ship[i].x,ship[i].y,"boom");
-				}
-			}
-			
-		}
-		
-	}, false);
-			
-	obj.addEventListener('touchstart', function(event) 
-	{
-		
-		//if there is only one finger starting to touch, reset the swipe length 
-		//counter as we are starting a new swipe
-		if(event.targetTouches.length==1)
-			swipeLength = 0;
-		
-		touchText = "";
-		//touchText = "touches: " + event.targetTouches.length;
-		
-		if(gameStarted)
-		{
-			for (var z = 0; z < event.targetTouches.length; z++)
-			{
-				var touch = event.targetTouches[z];
-				var x = touch.pageX;
-				var y = touch.pageY;
-				targetShip(x,y);
-				
-				////
-				//maybe we are trying to hit a panel and not a ship, whooops
-				for (var i = 0; i < panelX.length; i++)
-				{
-					if(getDist(panelX[i]+25,panelY[i]+25,x,y)<40)
-						layTrack(i);
-				}
-				/////
-				
-			}
-		}
-		
-	}, false);
-	
-	obj.addEventListener('touchend', function(event) 
-	{
-		/*
-		if(gameStarted)
-		{
-			
-			for (var z = 0; z < event.targetTouches.length; z++)
-			{
-								
-				var touch = event.targetTouches[z];
-				var x = touch.pageX;
-				var y = touch.pageY;
-				targetShip(x,y);
-			}
-		}
-		*/
-		
-	}, false);
-	
-	function canvasClick(event)
-	{
-		if(gameStarted)
-		{
-			var x = event.clientX;
-			var y = event.clientY;
-			targetShip(x,y);
-		}
 	}
 	
 	//called when the story dialog (storyScreen) is open 
@@ -1476,7 +1511,6 @@
 		
 		globalTimer = 60;
 		
-		
 		lastRailX = 4;
 		lastRailY = -10;
 		lastRailType = "up";
@@ -1617,6 +1651,9 @@
 			
 	}
 	
+	//star methods disabled but preserved 
+	//if we want scrolling clouds and shit like that later
+	/*
 	function drawStars()
 	{
 		//do literally nothing 
@@ -1700,27 +1737,7 @@
 					star[i].colour  = colorArray[Math.floor(Math.random() * colorArray.length)];
 			}
 		}
-		
-		//draw planets and nebulae
-		/*
-		for (var i = 0; i < planet.length; i++)
-		{
-			if(planet[i].type == "planet_redblue")
-				context.drawImage(planetImg[0],planet[i].x-cameraX,planet[i].y-cameraY)
-			else if (planet[i].type == "planet_blue")
-				context.drawImage(planetImg[1],planet[i].x-cameraX,planet[i].y-cameraY)
-			else if (planet[i].type == "moon_red")
-				context.drawImage(planetImg[2],planet[i].x-cameraX,planet[i].y-cameraY);
 				
-			if(planet[i].type == "nebulaA")
-				context.drawImage(nebulaA,planet[i].x-cameraX,planet[i].y-cameraY)
-			else if (planet[i].type == "nebulaB")
-				context.drawImage(nebulaB,planet[i].x-cameraX,planet[i].y-cameraY)
-			else if (planet[i].type == "nebulaC")
-				context.drawImage(nebulaC,planet[i].x-cameraX,planet[i].y-cameraY);
-		}
-		*/
-		
 	}
 	
 	function old_drawStars()
@@ -1758,22 +1775,23 @@
 		
 		if(starTimer == 1)
 		{
-			/*
-			starTimer = 0;
-			starX_right = starX_right - (0.3*enginesOn);// -0.3;
-			starX = starX - (0.3*enginesOn);//-0.3;
 			
-			if(starX<=-1920)
-				starX=1920;
+			//starTimer = 0;
+			//starX_right = starX_right - (0.3*enginesOn);// -0.3;
+			//starX = starX - (0.3*enginesOn);//-0.3;
+			
+			//if(starX<=-1920)
+			//	starX=1920;
 				
-			if(starX_right<=-1920)
-				starX_right=1920;
-			*/			
+			//if(starX_right<=-1920)
+			//	starX_right=1920;
+						
 			
 		}
 		starTimer = starTimer +1;
 	
 	}
+	*/
 	
 	function preShake() 
 	{
@@ -1787,15 +1805,7 @@
 	{
 		context.restore();
 	}
-	
-	function getTileY(givenY)
-	{
-		var fmlY = tileSize + Math.floor(givenY - yTravelled);
-		if(fmlY < 0)
-			fmlY = fmlY + boundingHeight+64;
-		return(Math.floor(fmlY/tileSize));
-	}
-	
+		
 	function drawCamera()
 	{
 		
@@ -2027,15 +2037,6 @@
 		
 		
 		
-	}
-	
-	function playerMouseMove(event)
-	{
-		mouseX = event.clientX;
-		mouseY = event.clientY;
-		//alert("hi");
-		adjustedMouseX = mouseX+cameraX;
-		adjustedMouseY = mouseY+cameraY;
 	}
 	
 	function rotateA2B(a,b)
