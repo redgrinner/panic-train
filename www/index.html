@@ -643,18 +643,6 @@
 	//a lof of this shit (and other shit)
 	//can be found in startingSetup() and hello()
 	
-	mapWidth = 10; 
-	mapHeight = 10
-	
-	map = [];
-	for (x = 0; x < mapWidth; x++)
-	{
-		map[x] = [];
-		for (y = 0; y < mapHeight; y++)
-		{
-			map[x][y] = new tile(".", "d", "500", true);
-		}
-	}
 	tileSize = 32;
 	
 	bloodDecal = [];
@@ -682,7 +670,7 @@
 	greenSquare = new Image();
 	greenSquare.src = "images/green.png";
 	
-	playerHealth = 3;
+	
 	playerLevel = 1;
 	
 	gameStarted = false;
@@ -869,9 +857,26 @@
 
 		if(keyPressed=="VK_LEFT")
 		{
-			//do nothing
+			comp[0].direction="left";
 		}
-				
+		else if(keyPressed=="VK_RIGHT")
+		{
+			comp[0].direction="right";
+		}
+		else if(keyPressed=="VK_UP")
+		{
+			comp[0].direction="up";
+		}
+		else if(keyPressed=="VK_DOWN")
+		{
+			comp[0].direction="down";
+		}
+		
+		else if(keyPressed=="VK_F")
+		{
+			
+		}
+		
 		else if(keyPressed==keyArray[0][1])
 			layTrack(0)
 		else if(keyPressed==keyArray[1][1])
@@ -980,6 +985,7 @@
 			var x = event.clientX;
 			var y = event.clientY;
 			targetShip(x,y);
+			//targetShip(x+cameraX,y+cameraY);
 		}
 	}
 	
@@ -998,20 +1004,23 @@
 	//called when the player presses a key to lay track
 	function layTrack(p)
 	{
+				
+		//attempt to re-rail a derailed train
+		//doesn't quite work yet
+		if(map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b=="d")
+		{
+			lastRailX = Math.floor(comp[0].x/tileSize);
+			lastRailY = Math.floor(comp[0].y/tileSize);
+			railOption[p] = "up";
+			comp[0].direction = "up";
+		}
 		
-		//if(RAAAAAAAAAAAAAAFE)
-		//	do_your_shield_wolf_magic_here()
-		//fix shit up
-		//add in variable tracks, direction changes etc.		
-		//
-		
-		//contents of this function are largely placeholder/garbage
-		
+		//lay an appropriate track
 		if((railOption[p]=="up") || (railOption[p]=="topleft") || (railOption[p]=="topright"))
 		{
 			lastRailY = lastRailY - 1;
 			if(lastRailY<0)
-				lastRailY = mapHeight-1;
+				lastRailY = insaneHeight-1;	//mapHeight
 		}
 		else if((railOption[p]=="left") || (railOption[p]=="bottomleft"))
 		{
@@ -1022,8 +1031,8 @@
 		else if((railOption[p]=="right")  || (railOption[p]=="bottomright"))
 		{
 			lastRailX = lastRailX + 1;
-			if(lastRailX>mapWidth-1)
-				lastRailX = mapWidth-1;
+			if(lastRailX>insaneWidth-1) //mapWidth
+				lastRailX = insaneWidth-1;
 		}
 		
 		//we should probably add in tracks that are combined with dangers here
@@ -1191,6 +1200,8 @@
 		
 			//x = x +16;
 			//y = y +16;
+			x=x+cameraX;
+			y=y+cameraY;
 		
 			var lethalHit = true;		
 			var targetHit = false;
@@ -1209,11 +1220,11 @@
 			
 			if(targetHit==false)
 			{
-				explodeSomething(x,y,"spark");
+				explodeSomething(x-cameraX,y-cameraY,"spark");
 			}
 			else if((targetHit==true) && (lethalHit==false))
 			{
-				explodeSomething(x,y,"ting");
+				explodeSomething(x-cameraX,y-cameraY,"ting");
 			}
 				
 			// If there's exactly one finger inside this element
@@ -1231,11 +1242,12 @@
 		
 	function respawnShip(p)
 	{
+		ship[p].x = comp[0].x - (Math.floor(Math.random() * (boundingWidth))*0.5) + (Math.floor(Math.random() * (boundingWidth))*0.5);
+		ship[p].y = comp[0].y-(boundingHeight/2)-32;
+			
+		//if(ship[p].type=="spy")
+		//	ship[p].y = 50+Math.floor(Math.random() * (boundingHeight-140))+boundingY;
 		
-		ship[p].x = 30+ Math.floor(Math.random() * (boundingWidth-80))+boundingX;
-		ship[p].y = 50;
-		if(ship[p].type=="spy")
-			ship[p].y = 50+Math.floor(Math.random() * (boundingHeight-140))+boundingY;
 		ship[p].targetX = Math.floor(Math.random() * boundingWidth)+boundingX;
 		ship[p].targetY = boundingHeight;
 		
@@ -1313,7 +1325,7 @@
 		document.getElementById('level_fail').innerHTML = "LEVEL: " + playerLevel;
 		playerScore = 0;
 		playerLevel = 1;
-		playerHealth = 3;
+		playerHealth = 10;
 		hello();
 		document.getElementById('loseScreen').style.display = "block";
 		document.getElementById('primaryCanvas').style.display = "none";
@@ -1373,8 +1385,6 @@
 		y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 		//alert(x + ' × ' + y);
 				
-		
-		
 		//if(isMobileDevice()==false)
 		//{
 		//	x = 500;
@@ -1389,26 +1399,23 @@
 		boundingWidth = x-30;
 		boundingHeight = y-30;
 		
-		context = document.getElementById('primaryCanvas').getContext('2d');
-		
-		
-		lastRailX = 4;
-		lastRailY = -10;
-		lastRailType = "up";
-		railRep = [];
-		railOption = [];
-		railOption[0] = "up";
-		railOption[1] = "up";
-		railRep[0] = rail;
-		railRep[1] = rail;
-		yTravelled = 0;
+		//boundingX = 150;
+		//boundingY = 150;
+		//boundingWidth = x-300;
+		//boundingHeight = y-300;
 		
 		panelX = [];
 		panelY = [];
 		panelX[0] = boundingX+30;
-		panelY[0] = boundingHeight-80-48;
+		panelY[0] = boundingHeight-300+180;
 		panelX[1] = boundingWidth-100;
-		panelY[1] = boundingHeight-80-48;
+		panelY[1] = boundingHeight-300+180;
+		
+		context = document.getElementById('primaryCanvas').getContext('2d');
+		
+		
+	
+		
 		
 			
 		bloodX = []
@@ -1418,41 +1425,16 @@
 		mapWidth = Math.floor(boundingWidth/tileSize); //33 //20
 		mapHeight = Math.floor(boundingHeight/tileSize)+3;
 		
+		//alert(mapWidth);
+		insaneWidth = 300; //150
+		insaneHeight = 300; //50
 		map = [];
-		for (x = 0; x < mapWidth; x++)
-		{
-			map[x] = [];
-			for (y = 0; y < mapHeight; y++)
-			{
-				map[x][y] = new tile(".", "d", "500", true);
-				map[x][y].x = x*tileSize;
-				map[x][y].y = y*tileSize;
-				var r = Math.floor(Math.random()*3); //4
-				if(r==0)
-					map[x][y].f = "a"
-				else if(r==1)
-					map[x][y].f = "b"
-				else if(r==2)
-					map[x][y].f = "c"
-				else if(r==3)
-					map[x][y].f = "d";
-				
-			}
-		}
 		
-		x = lastRailX;
-		for (y = 0; y < mapHeight; y++)
-		{
-			map[x][y].b = "up";
-		}
-		
-		//nX = Math.floor(Math.random() * boundingWidth)+boundingX;;
-		//nY = Math.floor(Math.random() * boundingHeight)+boundingY;;
 		playerScore = 0;
 		globalTimer = 60;
 		enemiesLeft = 20;
 		
-		distanceTravelled = 0;
+		
 		
 		shipDY = 0;
 		shipDX = 0;
@@ -1480,6 +1462,7 @@
 		player.dx = 0;
 		player.dy = -0.5; //-1
 		
+		/*
 		star = [];
 		for (var i = 0; i < 270; i++) //500 //270
 		{
@@ -1487,8 +1470,9 @@
 			var rY = Math.floor(Math.random() * boundingHeight)+boundingY;
 			star[star.length] = new heavenlyBody(rX,rY);
 		}
+		*/
 		
-		playerHealth = 3;
+		
 		hello();
 		
 		grindTimer = 0;
@@ -1500,6 +1484,10 @@
 	function hello()
 	{
 		
+		playerHealth = 10;
+		distanceToGoal = 600;
+		distanceTravelled = 0;
+	
 		gameStarted = false;
 		finalCountdown = 5000;
 		
@@ -1514,8 +1502,8 @@
 		
 		globalTimer = 60;
 		
-		lastRailX = 4;
-		lastRailY = -10;
+		lastRailX = 150;
+		lastRailY = 150-10;
 		lastRailType = "up";
 		railRep = [];
 		railOption = [];
@@ -1525,30 +1513,23 @@
 		railRep[1] = rail;
 		yTravelled = 0;
 		
-		panelX = [];
-		panelY = [];
-		panelX[0] = boundingX+30;
-		panelY[0] = boundingHeight-80-48;
-		panelX[1] = boundingWidth-100;
-		panelY[1] = boundingHeight-80-48;
-			
 		bloodX = []
 		bloodY = []
 		bloodID = [];
 		
-		mapWidth = Math.floor(boundingWidth/tileSize); //33 //20
-		mapHeight = Math.floor(boundingHeight/tileSize)+3;
+		//mapWidth = Math.floor(boundingWidth/tileSize); 
+		//mapHeight = Math.floor(boundingHeight/tileSize)+3;
 		
 		map = [];
-		for (x = 0; x < mapWidth; x++)
+		for (x = 0; x < insaneWidth; x++)
 		{
 			map[x] = [];
-			for (y = 0; y < mapHeight; y++)
+			for (y = 0; y < insaneHeight; y++)
 			{
 				map[x][y] = new tile(".", "d", "500", true);
 				map[x][y].x = x*tileSize;
 				map[x][y].y = y*tileSize;
-				var r = Math.floor(Math.random()*3); //4
+				var r = Math.floor(Math.random()*4); //4
 				if(r==0)
 					map[x][y].f = "a"
 				else if(r==1)
@@ -1556,27 +1537,31 @@
 				else if(r==2)
 					map[x][y].f = "c"
 				else if(r==3)
-					map[x][y].f = "d";
+				{
+					if(Math.floor(Math.random()*10)>=8)
+						map[x][y].f = "d"
+					else
+						map[x][y].f = "a";
+				}
 				
 			}
 		}
 		
 		x = lastRailX;
-		for (y = 0; y < mapHeight; y++)
+		for (y = lastRailY; y < lastRailY+100; y++)
 		{
 			map[x][y].b = "up";
 		}
 		
-		
 		comp = [];
 		//comp[0] = new entity((lastRailX*tileSize)+16,32*8,"trainFront");
-		
-		comp[0] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*0),"trainFront");
-		comp[1] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*1),"trainWood");
-		comp[2] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*2),"trainWood");
-		comp[3] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*3),"trainGoods");
-		comp[4] = new entity((lastRailX*tileSize)+16,(boundingHeight-(32*8))+(32*4),"trainBack");
-		
+		var altValue = 16; //16
+		comp[0] = new entity((lastRailX*tileSize)+altValue,((lastRailY*tileSize)+(32*8))+(32*0),"trainFront");
+		comp[1] = new entity((lastRailX*tileSize)+altValue,((lastRailY*tileSize)+(32*8))+(32*1),"trainWood");
+		comp[2] = new entity((lastRailX*tileSize)+altValue,((lastRailY*tileSize)+(32*8))+(32*2),"trainWood");
+		comp[3] = new entity((lastRailX*tileSize)+altValue,((lastRailY*tileSize)+(32*8))+(32*3),"trainGoods");
+		comp[4] = new entity((lastRailX*tileSize)+altValue,((lastRailY*tileSize)+(32*8))+(32*4),"trainBack");
+				
 		for (var i = 0; i < 4; i++)
 		{
 			comp[i].direction = "up";
@@ -1593,61 +1578,43 @@
 		{
 			globalTimer = 10;
 			enemiesLeft = 20; // 10;
-			ship[0] = new entity(0,0,"fan");
-			ship[1] = new entity(0,0,"fan");
-			ship[2] = new entity(0,0,"fan");
 		}
 		
 		else if(playerLevel==2)
 		{
 			globalTimer = 20;
 			enemiesLeft = 20; //20;
-			ship[0] = new entity(0,0,"fan");
-			ship[1] = new entity(0,0,"fan");
-			ship[2] = new entity(0,0,"fan");
 		}
 		
 		else if(playerLevel==3)
 		{
 			globalTimer = 30;
 			enemiesLeft = 30;
-			ship[0] = new entity(0,0,"fan");
-			ship[1] = new entity(0,0,"fan");
-			ship[2] = new entity(0,0,"fan");
 		}
 		
 		else if(playerLevel==4)
 		{
 			globalTimer = 40;
 			enemiesLeft = 40;			
-			ship[0] = new entity(0,0,"fan");
-			ship[1] = new entity(0,0,"fan");
-			ship[2] = new entity(0,0,"fan");
 		}
 		
 		else if(playerLevel==5)
 		{
 			globalTimer = 50;
 			enemiesLeft = 50;
-			ship[0] = new entity(0,0,"fan");
-			ship[1] = new entity(0,0,"fan");
-			ship[2] = new entity(0,0,"fan");
 		}
 		
 		else
 		{
 			globalTimer = 60;
 			enemiesLeft = 60;
-			ship[0] = new entity(0,0,"fan");
-			ship[1] = new entity(0,0,"fan");
-			ship[2] = new entity(0,0,"fan");
 		}
 		
-		//ship = [];
-		//for (var i = 0; i < 100; i++)
-		//{
-		//	ship[ship.length] = new entity(10,10,"fan");
-		//}
+		ship = [];
+		for (var i = 0; i < 3; i++)
+		{
+			ship[ship.length] = new entity(10,10,"fan");
+		}
 		
 		for (var i = 0; i < ship.length; i++)
 		{
@@ -1657,6 +1624,8 @@
 		//playerScore = 0;
 		
 		screenShakeDuration = 0;
+		
+		continueGame();
 			
 	}
 	
@@ -1814,11 +1783,20 @@
 	{
 		context.restore();
 	}
-		
-	function drawCamera()
+	
+	function drawAdjustedCamera()
 	{
-		
+	
 		context.clearRect(0, 0, canvas.width, canvas.height);
+		
+		//context.beginPath();
+		//context.fillStyle = "black";
+		//context.fillRect(boundingX+5, boundingY+5, boundingWidth-10, boundingHeight-10);
+		//context.stroke();
+		//context.closePath();
+		
+		cameraX = comp[0].x-canvas.width/2;
+		cameraY = comp[0].y-canvas.height/2;
 		
 		//old_drawStars();
 		//drawStars();
@@ -1827,20 +1805,42 @@
 		{
 		
 			//document.getElementById("primaryCanvas").getContext('2d').drawImage(dirt, 50, 50);
-		
-			for (x = 0; x < mapWidth; x++)
+			
+			//determine what section of the map is within the viewscreen
+			//we don't need to draw extra shit
+			startingYTile = (Math.floor((0-boundingY-cameraY)/tileSize)*-1)-1;
+			if(startingYTile < 0)
+				startingYTile = 0;
+			
+			endingYTile = startingYTile + Math.floor(boundingHeight/tileSize)+2;
+			if(endingYTile>=map[0].length)
+				endingYTile = map[0].length-1;
+			
+			startingXTile = (Math.floor((0-boundingX-cameraX)/tileSize)*-1)-1;
+			if(startingXTile < 0)
+				startingXTile = 0;
+			
+			endingXTile = startingXTile + Math.floor(boundingWidth/tileSize)+2;
+			if(endingXTile>=map.length)
+				endingXTile = map.length-1;
+			
+			//don't draw the whole fucking map, just the tiles that are visible (and a lil extra)
+			//for (x = 0; x < insaneWidth; x++)
+			for (x = startingXTile; x < endingXTile; x++)
 			{
-				for (y = 0; y < mapHeight; y++)
+				//for (y = 0; y < insaneHeight; y++)
+				for (y = startingYTile; y < endingYTile; y++)
 				{
 					if(map[x][y].f=="a")
-						context.drawImage(dirt, map[x][y].x, map[x][y].y)
+						tempImg = dirt;
 					else if(map[x][y].f=="b")
-						context.drawImage(dirtB, map[x][y].x, map[x][y].y) //stone
+						tempImg = dirtB
 					else if(map[x][y].f=="c")
-						context.drawImage(dirtC, map[x][y].x, map[x][y].y)
+						tempImg = dirtC
 					else if(map[x][y].f=="d")
-						context.drawImage(stone, map[x][y].x, map[x][y].y);	
+						tempImg = stone;
 					
+					context.drawImage(tempImg, map[x][y].x-cameraX, map[x][y].y-cameraY);
 					
 					//scrolling text check
 					/*
@@ -1857,47 +1857,62 @@
 					//left right here 
 					//also think about directions of things, we have some issues 
 					//not sure how approaching rails from diff directions changes things 
+			
 					if((map[x][y].b=="up") || (map[x][y].b=="down"))
-						context.drawImage(rail, map[x][y].x, map[x][y].y)
+						tempImg = rail
 					else if((map[x][y].b=="left") || (map[x][y].b=="right"))
-						context.drawImage(railH, map[x][y].x, map[x][y].y)
+						tempImg = railH
 					else if(map[x][y].b=="railH")
-						context.drawImage(railH, map[x][y].x, map[x][y].y)
+						tempImg = railH
 					else if(map[x][y].b=="topleft")
-						context.drawImage(railTopLeft, map[x][y].x, map[x][y].y)	
+						tempImg = railTopLeft;
 					else if(map[x][y].b=="topright")
-						context.drawImage(railTopRight, map[x][y].x, map[x][y].y)
+						tempImg = railTopRight
 					else if(map[x][y].b=="bottomleft")
-						context.drawImage(railBottomLeft, map[x][y].x, map[x][y].y)
+						tempImg = railBottomLeft
 					else if(map[x][y].b=="bottomright")
-						context.drawImage(railBottomRight, map[x][y].x, map[x][y].y);
-					//else
-					///	context.drawImage(dirtB, x*tileSize, y*tileSize);
+						tempImg = railBottomRight;
+					
+					context.drawImage(tempImg, map[x][y].x-cameraX, map[x][y].y-cameraY);
+					
 				}
 			}
+			
+			
 			
 			trainX = lastRailX*tileSize;
 			trainY = boundingHeight-400;
 						
 			for (var i = 0; i < bloodX.length; i++)
 			{
-				context.drawImage(bloodDecal[bloodID[i]], bloodX[i], bloodY[i]);
+				//if(withinBoundsWH(bloodX[i]-cameraX,bloodY[i]-cameraY,32,32)==true)
+					context.drawImage(bloodDecal[bloodID[i]], bloodX[i]-cameraX, bloodY[i]-cameraY);
 			}
 			
 			for (var i = 0; i < ship.length; i++)
 			{
 				if(ship[i].type == "fan")
-					drawR(ship[i].image,ship[i].x,ship[i].y,0,"primaryCanvas")
+					drawR(ship[i].image,ship[i].x-cameraX,ship[i].y-cameraY,0,"primaryCanvas")
 				else
-					drawR(ship[i].image,ship[i].x,ship[i].y,ship[i].rot+90,"primaryCanvas");
+					drawR(ship[i].image,ship[i].x-cameraX,ship[i].y-cameraY,ship[i].rot+90,"primaryCanvas");
 			}
 			
 			for (var i = 0; i < comp.length; i++)
 			{
-				drawR(comp[i].image,comp[i].x,comp[i].y,comp[i].rot+90,"primaryCanvas")
+				
+				drawR(comp[i].image,comp[i].x-cameraX,comp[i].y-cameraY,comp[i].rot,"primaryCanvas");
+				
+				/*if(comp[i].direction=="up")
+					drawR(comp[i].image,comp[i].x-cameraX,comp[i].y-cameraY,comp[i].rot+90,"primaryCanvas")
+				else if(comp[i].direction=="left")
+					drawR(comp[i].image,comp[i].x-cameraX,comp[i].y-cameraY,comp[i].rot+90-45,"primaryCanvas")
+				else if(comp[i].direction=="right")
+					drawR(comp[i].image,comp[i].x-cameraX,comp[i].y-cameraY,comp[i].rot+90+45,"primaryCanvas")
+				else if(comp[i].direction=="down")
+					drawR(comp[i].image,comp[i].x-cameraX,comp[i].y-cameraY,comp[i].rot+90+90,"primaryCanvas");*/
 			}
 									
-			drawR(trainTurret, comp[2].x,comp[2].y,getRotFromMouseXY(comp[2].x,comp[2].y)+90,"primaryCanvas");
+			drawR(trainTurret, comp[2].x-cameraX,comp[2].y-cameraY,getRotFromMouseXY(comp[2].x,comp[2].y)+90,"primaryCanvas");
 			
 			
 			
@@ -1908,7 +1923,7 @@
 		//draw explosions
 		for (var i = exp.length-1; i >= 0; i--)
 		{
-			document.getElementById(exp[i].canvas).getContext('2d').drawImage(explosionSheet, 50*exp[i].frame, 0, 50, 50, exp[i].x-35, exp[i].y-35, 50, 50);
+			document.getElementById(exp[i].canvas).getContext('2d').drawImage(explosionSheet, 50*exp[i].frame, 0, 50, 50, exp[i].x-35-cameraX, exp[i].y-35-cameraY, 50, 50);
 			
 			exp[i].frame = exp[i].frame + 1;
 			if(exp[i].frame==11)
@@ -1942,27 +1957,13 @@
 			//wrapText(context, "TIMER: " +globalTimer, (boundingWidth/2)-30, 25, maxWidth, lineHeight);
 			//wrapText(context, "ENEMIES LEFT: " +enemiesLeft, (boundingWidth/2)-80, 25, maxWidth, lineHeight);
 			
-			distanceTravelled = distanceTravelled + 0.2;
-			
-			wrapText(context, "DISTANCE TRAVELLED: " +Math.floor(distanceTravelled) +"m", (boundingWidth/2)-150, 25, maxWidth, lineHeight);
+			//wrapText(context, "DISTANCE TRAVELLED: " +Math.floor(distanceTravelled) +"m", (boundingWidth/2)-150, 25, maxWidth, lineHeight);
+			wrapText(context, "DISTANCE TO GOAL: " +Math.floor(distanceToGoal) +"m", (boundingWidth/2)-150, 25, maxWidth, lineHeight);
 			
 			
 			//maxWidth = 300;
 			//wrapText(context, touchText, 25, 50, maxWidth, lineHeight);
-		
-			//playerHealth = 10;
-		
-			//left and right panels and rail icons
-			//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, boundingX+30, boundingHeight-80-48);
-			//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[0], boundingX+30+8, boundingHeight-80-48+9);
-			//document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, boundingWidth-100, boundingHeight-80-48);
-			//document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[1], boundingWidth-100+8, boundingHeight-80-48+9);
-			
-			//panelX[0] = boundingX+30;
-			//panelY[0] = boundingHeight-80-48;
-			//panelX[1] = boundingWidth-100;
-			//panelY[1] = boundingHeight-80-48;
-			
+					
 			//left and right panels and rail icons
 			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[0], panelY[0]);
 			document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[0], panelX[0]+8, panelY[0]+9);
@@ -1970,30 +1971,64 @@
 			document.getElementById("primaryCanvas").getContext('2d').drawImage(railRep[1],panelX[1]+8, panelY[1]+9);
 					
 			//left and right panels for keys 
-			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[0], boundingHeight-80);
-			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[1], boundingHeight-80);
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[0], panelY[0]+45); //boundingHeight-80
+			document.getElementById("primaryCanvas").getContext('2d').drawImage(panel, panelX[1], panelY[1]+45);
 			
+								
 			
+			/*
+			startingTile = Math.floor((0-boundingY-cameraY)/tileSize)*-1;
+			if(startingTile < 0)
+				startingTile = 0;
+			
+			endingTile = startingTile + Math.floor(boundingHeight/tileSize);
+			if(endingTile>=map[0].length)
+				endingTile = map[0].length-1;
+			*/
 			
 			
 			context.font = '24pt Calibri';
 			context.fillStyle = 'white';
 			adjustX = 13;
-			adjustY = 33;
-			wrapText(context, keyArray[0][0], boundingX+30+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
-			wrapText(context, keyArray[1][0], boundingWidth-100+adjustX, boundingHeight-80+adjustY, maxWidth, lineHeight);
-						
+			adjustY = 80;
+			wrapText(context, keyArray[0][0], panelX[0]+adjustX, panelY[0]+adjustY, maxWidth, lineHeight);
+			wrapText(context, keyArray[1][0], panelX[1]+adjustX, panelY[0]+adjustY, maxWidth, lineHeight);
+					
+			wrapText(context, "Map " + Math.floor(comp[0].x/tileSize) + ";" + getTileY(comp[0].y) + " is " + map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b, 300, 540, maxWidth, lineHeight);
+			
+					
+			//endingTile = Math.floor((0-boundingHeight-cameraY)/tileSize)*-1;
+			
+			/*
+			
+			context.fillStyle = 'black';
+			wrapText(context, "cameraY: "+cameraY, 300, 300, maxWidth, lineHeight);
+			wrapText(context, "map[0][0].y: "+map[0][0].y, 300, 360, maxWidth, lineHeight);
+			wrapText(context, "diff: "+(map[0][0].y-boundingY-cameraY), 300, 390, maxWidth, lineHeight);
+			wrapText(context, "st: "+startingYTile, 300, 420, maxWidth, lineHeight);
+			wrapText(context, "et: "+endingYTile, 300, 450, maxWidth, lineHeight);
+			
+			wrapText(context, "stX: "+startingXTile, 300, 480, maxWidth, lineHeight);
+			wrapText(context, "etX: "+endingXTile, 300, 520, maxWidth, lineHeight);
+			
+			
+			
 			
 			//reports on some of the tile/track positioning
+						
 			x = 1;
-			for (y = 0; y < mapHeight; y++)
+			for (y = 0; y < insaneHeight; y++)
 			{
 				context.fillStyle = 'white';
 				var maxWidth = 500;//400
 				var lineHeight = 25;
-				wrapText(context, ""+y+";"+Math.floor(map[x][y].y), map[x][y].x, map[x][y].y, maxWidth, lineHeight);
+				wrapText(context, ""+y+";"+Math.floor(map[x][y].y), map[x][y].x-cameraX, map[x][y].y-cameraY+30, maxWidth, lineHeight);
 			}
-						
+			context.fillStyle = 'white';
+			*/
+			
+			
+			/*			
 			maxWidth = 1000;
 			wrapText(context, "The car is at "+comp[0].y + " pixels", 300, 300, maxWidth, lineHeight);
 			wrapText(context, "Objectively, the the tile would be: "+comp[0].y + "/ tileSize, so " +Math.floor(comp[0].y/tileSize), 300, 330, maxWidth, lineHeight);
@@ -2011,19 +2046,20 @@
 			wrapText(context, "The train might be on tile: " + getTileY(comp[0].y), 300, 510, maxWidth, lineHeight);
 			wrapText(context, "Map " + Math.floor(comp[0].x/tileSize) + ";" + getTileY(comp[0].y) + " is " + map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b, 300, 540, maxWidth, lineHeight);
 			
+			*/
 			
-			if(map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b==".")
+			
+			if(map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b=="d")
 			{
 				//train not on a rail
-				//playerHealth--;
-				
+				//alert("hello");
 				grindTimer++;
-				if(grindTimer>3)
+				if(grindTimer>10)
 				{
 					grindTimer = 0;
 					
-					explodeSomething(comp[0].x-16,comp[0].y+16,"spark");
-					explodeSomething(comp[0].x+16,comp[0].y+16,"spark");
+					explodeSomething(comp[0].x-16-cameraX,comp[0].y+16-cameraY,"spark");
+					explodeSomething(comp[0].x+16-cameraX,comp[0].y+16-cameraY,"spark");
 					//playerHealth--;
 					if(playerHealth <= 0)
 					{
@@ -2047,6 +2083,7 @@
 		
 		
 	}
+		
 	
 	function rotateA2B(a,b)
 	{
@@ -2116,10 +2153,33 @@
 		return angle * (Math.PI / 180);
 	}
 	
+	function withinBounds(x,y)
+	{
+		if	(
+				(x<boundingX) || (y<boundingY) ||
+				(x>boundingX+boundingWidth) || (y>boundingY+boundingHeight)
+			)
+			return(false)
+		else
+			return(true);
+	}
+	
+	function withinBoundsWH(x,y,w,h)
+	{
+		if	(
+				(x<boundingX-(w/2)) || (y<boundingY-(h/2)) ||
+				(x>boundingX+boundingWidth+(w/2)) || (y>boundingY+boundingHeight+(h/2))
+			)
+			return(false)
+		else
+			return(true);
+	}
+	
+	
 	function drawR(image,x,y,rot,c)
 	{
 		//if(withinBounds(x,y))
-	//	if(withinBoundsWH(x,y,image.width,image.height))
+		if(withinBoundsWH(x,y,image.width,image.height))
 		{
 			var canvas = document.getElementById(c);
 			var context = document.getElementById(c).getContext('2d');
@@ -2141,8 +2201,39 @@
 	
 	function handleTrainMovement()
 	{
+		
+		/*
+		var i = 0;
+		//for (var i = comp.length-1; i >= 0; i--)
+		{
+			if(comp[i].direction=="up")
+			{
+				comp[i].dx = 0;
+				comp[i].dy = -0.5;
+			}
+			else if(comp[i].direction=="down")
+			{
+				comp[i].dx = 0;
+				comp[i].dy = 0.5;
+			}
+			else if(comp[i].direction=="left")
+			{
+				comp[i].dy = 0;
+				comp[i].dx = -0.5;
+			}
+			else if(comp[i].direction=="right")
+			{
+				comp[i].dy = 0;
+				comp[i].dx = 0.5;
+			}
+			comp[i].x += comp[i].dx*3;
+			comp[i].y += comp[i].dy*3;
+		}
+		*/
+		
+		
 		isMovingUp = false;
-				
+					
 		for (var i = comp.length-1; i >= 0; i--)
 		{
 			var tileX = Math.floor(comp[i].x/tileSize);
@@ -2150,44 +2241,71 @@
 					
 			if((map[tileX][tileY].b=="up") || (map[tileX][tileY].b=="bottomleft") || (map[tileX][tileY].b=="bottomright"))
 			{
+				comp[i].dx = 0;
 				comp[i].dy = -0.5;
-				//if((i != 0) && (comp[0].dy==0))
-				if(isMovingUp==false)
-					comp[i].y = comp[i].y + comp[i].dy;
+				comp[i].direction = "up";
+							
+				if(map[tileX][tileY].b=="up")
+					comp[i].rot = 360
+				else if(map[tileX][tileY].b=="bottomleft")
+					comp[i].rot = 315
+				else if(map[tileX][tileY].b=="bottomright")
+					comp[i].rot = 45;
+				comp[i].rot = 360;
+								
 			}
+			else if(map[tileX][tileY].b=="down")
+			{
+				comp[i].dx = 0;
+				comp[i].dy = 0.5;
+				comp[i].direction = "down";
+				comp[i].rot = 180;
+			}			
 			else if((map[tileX][tileY].b=="topleft") || (map[tileX][tileY].b=="right"))
 			{
 				comp[i].dy = 0;
 				comp[i].dx = 0.5;
-				comp[i].x = comp[i].x + comp[i].dx;
+				comp[i].direction = "right";
+				if(map[tileX][tileY].b=="right")
+					comp[i].rot = 90
+				else if(map[tileX][tileY].b=="topleft")
+					comp[i].rot = 45;
+				comp[i].rot = 90;
 			}
 			else if((map[tileX][tileY].b=="topright") || (map[tileX][tileY].b=="left"))
 			{
 				comp[i].dy = 0;
 				comp[i].dx = -0.5;
-				comp[i].x = comp[i].x + comp[i].dx;
+				comp[i].direction = "left";
+				//comp[i].rot = 270;
+				if(map[tileX][tileY].b=="left")
+					comp[i].rot = 270
+				else if(map[tileX][tileY].b=="topright")
+					comp[i].rot = 315;
+				comp[i].rot = 270;
 			}
-			else
-				alert("DERAILED");
+			//else
+			//	alert("DERAILED");
 				//player.dy = -0.1;
 				
-			if(comp[0].dy!=0)
-				isMovingUp = true;
-			//if(comp[i].dy!=0)
-			//	isMovingUp = true;	
+			comp[i].x += comp[i].dx*3;
+			comp[i].y += comp[i].dy*3;
 			
 		}
 		
-		if(isMovingUp)
-		yTravelled = yTravelled - comp[0].dy; //player.dy;
-		if(yTravelled > boundingHeight+32)
-			yTravelled = -31;
+		distanceToGoal += comp[0].dy;
+		distanceTravelled -= comp[0].dy;
+		
+		if(distanceToGoal<=0)
+		{
+			distanceToGoal = 0;
+			showWin();
+		}
+		
 		
 		for (var i = bloodY.length-1; i >= 0; i--)
 		{
-			if(isMovingUp)
-			bloodY[i] = bloodY[i] -comp[0].dy; //player.dy;
-			if(bloodY[i] > boundingHeight+32)
+			if(withinBoundsWH(bloodX[i]-cameraX,bloodY[i]-cameraY,32,32)==false)
 			{
 				bloodX.splice(i,1);
 				bloodY.splice(i,1);
@@ -2195,6 +2313,15 @@
 			}
 		}
 		
+		/*
+		if(comp[0].dy!=0)
+			isMovingUp = true;
+		
+		if(isMovingUp)
+		yTravelled = yTravelled - comp[0].dy; //player.dy;
+		if(yTravelled > boundingHeight+32)
+			yTravelled = -31;
+				
 		for (x = 0; x < mapWidth; x++)
 		{
 			for (y = 0; y < mapHeight; y++)
@@ -2220,7 +2347,7 @@
 				}
 			}
 		}
-		
+		*/
 		
 		
 	}
@@ -2243,6 +2370,12 @@
 			else
 			{
 			
+				if(ship[i].type=="fan")
+				{
+					ship[i].targetX = comp[0].x;
+					ship[i].targetY = comp[0].y;
+				}
+				
 				x2 = ship[i].targetX;//player.x;
 				y2 = ship[i].targetY;//player.y;
 				x1 = ship[i].x;
@@ -2367,21 +2500,15 @@
 			ship[i].x = ship[i].x + ship[i].dx;
 			ship[i].y = ship[i].y + ship[i].dy;
 			
+			if(getDist(ship[i].x+16,ship[i].y+16,comp[0].x,comp[0].y)>900)
+			{
+				respawnShip(i);
+			}
 			
+			/*
 			if(ship[i].y > boundingHeight)
 			{
 				respawnShip(i);
-				
-				//screenShakeDuration = 15;
-				//playerHealth--;
-				//if(playerHealth <= 0)
-				//{
-				//	showDefeat();
-				//}
-				//else
-				//{
-				//	ship[i].health = 5000;
-				//}
 			}
 			
 			if(ship[i].x > boundingWidth)
@@ -2389,6 +2516,7 @@
 			
 			if(ship[i].x < 0)
 				ship[i].dx *= -1;
+			*/
 			
 			//out of map bounds 
 			/*
@@ -2457,26 +2585,30 @@
 				{
 					enemiesLeft--;
 					ship.splice(i,1);
-					if(enemiesLeft<=0)
-						showWin();
+					//if(enemiesLeft<=0)
+					//	showWin();
 				}
 
 			}
 			else 
 			{
 				
-				if(getDist(ship[i].x+16,ship[i].y+16,comp[0].x,comp[0].y)<32)
+				//check for contact with train compartments
+				for (var z = comp.length-1; z >= 0; z--)
 				{
-					ship[i].health = -100;
-					
-					playerHealth--;
-					if(playerHealth <= 0)
+					if((ship[i].health!=-100)&&(getDist(ship[i].x+16,ship[i].y+16,comp[z].x,comp[z].y)<32))
 					{
-						showDefeat();
+						ship[i].health = -100;
+						
+						playerHealth--;
+						if(playerHealth <= 0)
+						{
+							showDefeat();
+						}
+						
 					}
-					
 				}
-				
+								
 				if(ship[i].health <= 0)
 				{
 					
@@ -2509,9 +2641,6 @@
 					
 					if(enemiesLeft<=0)
 						showWin();
-					
-					
-						
 					
 				}
 				else if((ship[i].health == 5000) && (playerHealth > 0))
@@ -2546,11 +2675,13 @@
 		{
 			screenShakeDuration--;
 			preShake();
-			drawCamera();
+			drawAdjustedCamera();
+			//drawCamera();
 			postShake();
 		}
 		else
-			drawCamera();
+			drawAdjustedCamera();
+			//drawCamera();
 		
 		handleGameLogic();
 		
