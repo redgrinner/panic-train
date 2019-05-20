@@ -215,6 +215,16 @@
 			color: black;
             font-size: 20px;
 			font-family: "lindenhill_italic", Verdana, Tahoma; /*ineptic*/
+			
+						
+		}
+		
+		.noSelect
+		{
+			-webkit-user-select: none;  /* Chrome all / Safari all */
+			-moz-user-select: none;     /* Firefox all */
+			-ms-user-select: none;      /* IE 10+ */
+			user-select: none;          /* Likely future */   
 		}
 		
 		.menuImg
@@ -392,7 +402,7 @@
       
 	<canvas id="primaryCanvas" class="primaryCanvas" onmousemove="playerMouseMove(event)" onclick="canvasClick(event)"></canvas>
 	
-	<div id="menuScreen" class="menuScreen center">
+	<div id="menuScreen" class="menuScreen noSelect center">
 		<span id="menuTitle" class="titleText rainbow-text" style="color:orange">PANIC TRAIN</span>
 		<br />
 		<img width="250px" class="menuImg" src="images/TK/win.jpg">
@@ -402,16 +412,16 @@
 		<input type ="button" value ="START" style="width:245px;" onclick="showStory();" class="button2"><br />
 	</div>
 	
-	<div id="storyScreen" class="storyScreen center">
-		<div id="storyText" class="storyText"></div>
-		<span id="menuTitle" class="storyTitle" style="color:orange">Chapter One</span>
+	<div id="storyScreen" class="storyScreen noSelect center">
+		<div id="storyText" class="storyText "></div>
+		<span id="menuTitle" class="storyTitle " style="color:orange">Chapter One</span>
 		<br />
 		<img src="images/story2.png">
 		<br />
 		<input type ="button" value ="- CONTINUE -" style="width:250px;" onclick="continueText();" class="button3"><br />
 	</div>
 	
-	<div id="loseScreen" class="menuScreen center">
+	<div id="loseScreen" class="menuScreen noSelect center">
 		<span class="titleText" style="color:red">GAME OVER</span>
 		<br />
 		<img width="250px" class="menuImg" src="images/TK/fail.jpg"> 
@@ -424,7 +434,7 @@
 		<input type ="button" value ="RESTART" style="width:245px;" onclick="continueGame();" class="button2"><br />
 	</div>
 	
-	<div id="winScreen" class="menuScreen center">
+	<div id="winScreen" class="menuScreen noSelect center">
 		<span class="titleText" id="titleText" style="color:orange">VICTORY</span>
 		<br />
 		<img width="250px" class="menuImg" src="images/TK/win.jpg">
@@ -595,7 +605,7 @@
 		{
 			var r = Math.floor(Math.random() * 9)+1;
 			this.health = 1;
-			this.maxSpeed = 1; //2
+			this.maxSpeed = 0.5//1; //2
 			this.image.src = "images/fan"+r+".png";
 		}
 		else if(this.type=="trainFront") 
@@ -651,6 +661,13 @@
 		bloodDecal[i] = new Image();
 		bloodDecal[i].src = "images/blood_red"+i+".png";
 	}
+	
+	//expAnim = [];
+	//for (var i = 1; i < 7; i++)
+	//{
+	//	expAnim[i] = new Image();
+	//	expAnim[i].src = "images/PNG/explosion-"+i+".png";
+	//}
 	
 	panel = new Image();
 	panel.src = "images/panel.png";
@@ -1314,7 +1331,7 @@
 		document.getElementById('winScreen').style.display = "none";
 		document.getElementById('loseScreen').style.display = "none";
 		document.getElementById('primaryCanvas').style.display = "block";
-		//globalTimer = 60;
+		
 	}
 	
 	//called to show the failure screen
@@ -1407,9 +1424,9 @@
 		panelX = [];
 		panelY = [];
 		panelX[0] = boundingX+30;
-		panelY[0] = boundingHeight-300+180;
+		panelY[0] = boundingHeight-300+150;
 		panelX[1] = boundingWidth-100;
-		panelY[1] = boundingHeight-300+180;
+		panelY[1] = boundingHeight-300+150;
 		
 		context = document.getElementById('primaryCanvas').getContext('2d');
 		
@@ -1431,7 +1448,6 @@
 		map = [];
 		
 		playerScore = 0;
-		globalTimer = 60;
 		enemiesLeft = 20;
 		
 		
@@ -1485,7 +1501,7 @@
 	{
 		
 		playerHealth = 10;
-		distanceToGoal = 600;
+		distanceToGoal = 1000;
 		distanceTravelled = 0;
 	
 		gameStarted = false;
@@ -1499,8 +1515,6 @@
 		
 		exp = [];
 		ship = [];
-		
-		globalTimer = 60;
 		
 		lastRailX = 150;
 		lastRailY = 150-10;
@@ -1529,7 +1543,7 @@
 				map[x][y] = new tile(".", "d", "500", true);
 				map[x][y].x = x*tileSize;
 				map[x][y].y = y*tileSize;
-				var r = Math.floor(Math.random()*4); //4
+				var r = Math.floor(Math.random()*3); //4
 				if(r==0)
 					map[x][y].f = "a"
 				else if(r==1)
@@ -1576,37 +1590,32 @@
 		
 		if(playerLevel<=1)
 		{
-			globalTimer = 10;
+			distanceToGoal = 1000; 
 			enemiesLeft = 20; // 10;
 		}
 		
 		else if(playerLevel==2)
 		{
-			globalTimer = 20;
 			enemiesLeft = 20; //20;
 		}
 		
 		else if(playerLevel==3)
 		{
-			globalTimer = 30;
 			enemiesLeft = 30;
 		}
 		
 		else if(playerLevel==4)
 		{
-			globalTimer = 40;
 			enemiesLeft = 40;			
 		}
 		
 		else if(playerLevel==5)
 		{
-			globalTimer = 50;
 			enemiesLeft = 50;
 		}
 		
 		else
 		{
-			globalTimer = 60;
 			enemiesLeft = 60;
 		}
 		
@@ -1625,7 +1634,7 @@
 		
 		screenShakeDuration = 0;
 		
-		continueGame();
+		//continueGame();
 			
 	}
 	
@@ -1914,7 +1923,10 @@
 									
 			drawR(trainTurret, comp[2].x-cameraX,comp[2].y-cameraY,getRotFromMouseXY(comp[2].x,comp[2].y)+90,"primaryCanvas");
 			
-			
+			//for (var i = 1; i < expAnim.length; i++)
+			//{
+			//	context.drawImage(expAnim[i], 100, 0+i*100);
+			//}
 			
 			//context.drawImage(greenSquare, comp[0].x, comp[0].y);
 			
@@ -1954,7 +1966,6 @@
 			//wrapText(context, sCurr, (boundingWidth/2)-30, boundingHeight-50, maxWidth, lineHeight);
 			context.fillStyle = 'white';
 			
-			//wrapText(context, "TIMER: " +globalTimer, (boundingWidth/2)-30, 25, maxWidth, lineHeight);
 			//wrapText(context, "ENEMIES LEFT: " +enemiesLeft, (boundingWidth/2)-80, 25, maxWidth, lineHeight);
 			
 			//wrapText(context, "DISTANCE TRAVELLED: " +Math.floor(distanceTravelled) +"m", (boundingWidth/2)-150, 25, maxWidth, lineHeight);
@@ -1994,7 +2005,7 @@
 			wrapText(context, keyArray[0][0], panelX[0]+adjustX, panelY[0]+adjustY, maxWidth, lineHeight);
 			wrapText(context, keyArray[1][0], panelX[1]+adjustX, panelY[0]+adjustY, maxWidth, lineHeight);
 					
-			wrapText(context, "Map " + Math.floor(comp[0].x/tileSize) + ";" + getTileY(comp[0].y) + " is " + map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b, 300, 540, maxWidth, lineHeight);
+			//wrapText(context, "Map " + Math.floor(comp[0].x/tileSize) + ";" + getTileY(comp[0].y) + " is " + map[Math.floor(comp[0].x/tileSize)][getTileY(comp[0].y)].b, 300, 540, maxWidth, lineHeight);
 			
 					
 			//endingTile = Math.floor((0-boundingHeight-cameraY)/tileSize)*-1;
@@ -2288,8 +2299,8 @@
 			//	alert("DERAILED");
 				//player.dy = -0.1;
 				
-			comp[i].x += comp[i].dx*3;
-			comp[i].y += comp[i].dy*3;
+			comp[i].x += comp[i].dx*1;
+			comp[i].y += comp[i].dy*1;
 			
 		}
 		
@@ -2599,7 +2610,7 @@
 					if((ship[i].health!=-100)&&(getDist(ship[i].x+16,ship[i].y+16,comp[z].x,comp[z].y)<32))
 					{
 						ship[i].health = -100;
-						
+						screenShakeDuration =15;
 						playerHealth--;
 						if(playerHealth <= 0)
 						{
@@ -2613,7 +2624,7 @@
 				{
 					
 					playerScore = playerScore + 1;
-					screenShakeDuration = 15;
+					//screenShakeDuration = 15;
 							
 					exp[exp.length] = new explosion(ship[i].x+16,ship[i].y+16,"exp");
 					
@@ -2724,8 +2735,6 @@
 			if(finalCountdown <=0)
 				showActualWin();
 			
-			globalTimer--;
-			
 			if(waveMode)
 			{
 				if((enemiesLeft > ship.length) && (playerLevel >= 3))
@@ -2760,13 +2769,7 @@
 				}
 			}
 			
-			if(globalTimer < 0)
-			{
-				//doNothing()
-				//showWin();
-				
-				
-			}
+			
 		}
 	}
 	
